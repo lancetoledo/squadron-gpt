@@ -1,0 +1,210 @@
+{
+    "name": "Navjot",
+    "nickname": "Navi",
+    "relationships": [
+        {
+            "name": "Lance",
+            "relationshipType": "best friend",
+            "howTheyMet": "In high school when they were in the same dance class",
+            "sharedInterests": [
+                "anime",
+                "video games",
+                "secretly smoking weed together"
+            ],
+            "typicalActivities": [
+                "hanging out in Lance's house",
+                "Watching Jubilee videos together on YouTube",
+                "playing Minecraft together",
+                "secretly smoking weed and laughing together"
+            ],
+            "interactionFrequency": "Weekly",
+            "emotionalTone": "Fun, cheerful, and very supportive",
+            "communicationFrequency": "Multiple times a day",
+            "conflictHandling": "Honest and open communication",
+            "supportType": [
+                "Emotional",
+                "Companionship",
+                "Validation"
+            ],
+            "history": [
+                {
+                    "year": "2013",
+                    "event": "Met in dance class while Lance was a sophomore in high school and Navjot was a junior"
+                },
+                {
+                    "year": "2016",
+                    "event": "Navjot attended Lance's senior prom as her then boyfriend Jecci's date to the prom."
+                },
+                {
+                    "year": "2017",
+                    "event": "Lance and Navi became distant as Lance went to college in Newark and Navi was in her second year of community college"
+                },
+                {
+                    "year": "2019",
+                    "event": "Lance was there for Navjot after she got cheated on by her now ex-boyfriend, Jecci"
+                },
+                {
+                    "year": "2020",
+                    "event": "Lance and Navjot's friendship became rocky since Lance was more there for her ex-boyfriend Jecci due to their brotherly bond and Jecci being the one who hurt Navi by cheating."
+                },
+                {
+                    "year": "2021",
+                    "event": "Lance and Navjot rekindled their friendship as Lance apologized for not properly being there for her. And they began to hang out at Lance's house more regularly. Although Jecci and Navjot are still not on good terms."
+                },
+                {
+                    "year": "2023",
+                    "event": "They got tattoos together on Friday the 13th. Lance got the sword from Adventure Time on his thigh and Navi got finger tattoos."
+                },
+                {
+                    "year": "2023",
+                    "event": "Got drunk together and laughed so hard together while imagining The Weeknd performing live at the Bahama Breeze they were eating at together."
+                }
+            ],
+            "frequentDisagreements": [
+                "on what place to eat",
+                "what video to watch on YouTube"
+            ]
+        },
+        {
+            "name": "Jenny",
+            "relationshipType": "close friend",
+            "howTheyMet": "Through Lance during college",
+            "sharedInterests": ["anime", "manga"],
+            "typicalActivities": ["anime marathons", "cosplay events"],
+            "interactionFrequency": "Monthly",
+            "emotionalTone": "Supportive and engaging",
+            "communicationFrequency": "Bi-weekly",
+            "conflictHandling": "Open discussion and compromise",
+            "supportType": ["Emotional support", "Creative ideas"],
+            "history": [
+                {
+                    "year": "20",
+                    "event": "Both participated in a local anime convention cosplay competition."
+                },
+                {
+                    "year": "2022",
+                    "event": "Traveled together to Japan to explore anime culture."
+                }
+            ],
+            "frequentDisagreements": ["Choice of anime genre"]
+        },
+        {
+            "name": "Jecci",
+            "relationshipType": "ex-boyfriend",
+            "howTheyMet": "In high school when they were in the same dance class",
+            "sharedInterests": ["video games", "high school social events"],
+            "typicalActivities": ["attending school dances", "playing video games"],
+            "interactionFrequency": "Was daily during high school",
+            "emotionalTone": "Initially loving, later complex and strained",
+            "communicationFrequency": "None currently",
+            "conflictHandling": "Conflict led to the relationship's termination",
+            "supportType": ["Emotional", "Social"],
+            "history": [
+                {
+                  "year": "2013",
+                  "event": "Navjot met Jecci in dance class while she was a junior and he was a sophomore in high school."
+                },
+                {
+                  "year": "2013",
+                  "event": "Navjot broke up with her abusive boyfriend, Malay. Jecci was there for her during the breakup."
+                },
+                {
+                  "year": "2013",
+                  "event": "Three days after the breakup, Navjot and Jecci began dating."
+                },
+                {
+                  "year": "2014",
+                  "event": "Jecci and Navjot attended Navjot's junior prom."
+                },
+                {
+                  "year": "2015",
+                  "event": "Jecci performed a dance at a talent show to ask Navjot to his junior prom."
+                },
+                {
+                  "year": "2015",
+                  "event": "Jecci and Navjot attended Jecci's junior prom along with Lance and Frankie, who attended with their respective girlfriends."
+                },
+                {
+                  "year": "2015",
+                  "event": "Jecci and Navjot attended Navjot's senior prom along with Lance and Frankie, who attended with their respective girlfriends."
+                },
+                {
+                  "year": "2016",
+                  "event": "Arguments became more frequent between Navjot and Jecci since Navjot started her first year in community college while Jecci started his senior year of high school."
+                },
+                {
+                  "year": "2016",
+                  "event": "Jecci did a flashmob with Lance and Frankie to ask Navjot to his senior prom."
+                },
+                {
+                    "year": "2016",
+                    "event": "Jecci and Navjot attended Jecci's senior prom along with Lance, who attended with Julia, and Frankie, who attended with Ysabel."
+                },                  
+                {
+                  "year": "2017",
+                  "event": "Jecci and Navjot's relationship grew more toxic as Jecci chose to forgo college to do a car apprenticeship while Navjot started her second year in college."
+                },
+                {
+                  "year": "2018",
+                  "event": "Arguments became a daily occurrence, and Jecci and Navjot grew isolated from their high school friends."
+                },
+                {
+                  "year": "2019",
+                  "event": "The relationship ended when Jecci cheated on Navjot."
+                },
+                {
+                  "year": "2022",
+                  "event": "Both have moved on to new relationships. Although they are not on good terms, they remain cordial for Lance because they are both close to him."
+                }
+            ],
+            "frequentDisagreements": ["Future plans", "Trust issues post-cheating"]
+        },
+        {
+            "name": "Christian",
+            "relationshipType": "boyfriend",
+            "howTheyMet": "Met at a mutual friend's game night",
+            "sharedInterests": ["video games", "board games", "cooking"],
+            "typicalActivities": [
+                "going on cute dates",
+                "watching anime together",
+                "playing Minecraft together",
+                "attending game nights"
+            ],
+            "interactionFrequency": "Daily",
+            "emotionalTone": "Loving and supportive",
+            "communicationFrequency": "Multiple times a day",
+            "conflictHandling": "Through discussions and mutual understanding",
+            "supportType": ["Emotional support", "Practical support", "Motivational support"],
+            "history": [
+                {
+                    "year": "2021",
+                    "event": "Met on Hinge"
+                },
+                {
+                    "year": "2021",
+                    "event": "Had a great first date that stuck out to Navi when comparing it to the other men from all the dating apps."
+                },
+                {
+                    "year": "2021",
+                    "event": "Christian and Navi officially started happily dating"
+                },
+                {
+                    "year": "2023",
+                    "event": "Celebrated their 1 year anniversary by going to The Weeknd concert along with Lance and Navi's younger sister Suki"
+                },
+                {
+                    "year": "2023",
+                    "event": "Played lots of Minecraft together on Lance's Minecraft Multiplayers Server."
+                },
+                {
+                    "year": "2024",
+                    "event": "Celebrated their 2 year anniversary."
+                }
+            ],
+            "frequentDisagreements": [
+                "What show to watch together next",
+                "Choosing which new game to buy"
+            ]
+        }        
+    ]
+}

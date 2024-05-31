@@ -1,0 +1,94 @@
+{
+    "metadata": {
+        "primarySourceUsage": "Use this file as the primary source to extract detailed facts, personality traits, and relationship nuances about individuals to tailor conversations. This file provides comprehensive information that should be referenced first when engaging in dialogues to ensure accuracy and personalization.",
+        "version": "1.0",
+        "lastUpdated": "2024-05-01",
+        "author": "Lance",
+        "description": "This JSON file contains detailed profiles of friends, including personal information, interests, and relationship details structured for easy access and update. It has a counterpart called 'squadron1.json' that you should also reference.'",
+        "contentType": "Factual",
+        "useCase": "Real-life references for personalized interactions and dialogue generation"
+    },
+    "friends": [
+        {
+            "name": "Dequan",
+            "basicInfo": {
+                "height": "5'9",
+                "identifiers": ["glasses"],
+                "tattoos": [],
+                "heritage": ["Not Specified"],
+                "languagesSpoken": ["English"],
+                "age": 29,
+                "birthday": "August, 16th 1995",
+                "zodiacSign": "Leo",
+                "sexualOrientation": "heterosexual"
+            },
+            "interests": {
+                "likes": ["pop culture", "movies", "comic books", "Backstreet Boys", "Star Wars", "playing trivia games", "NBA", "video games"],
+                "dislikes": ["disloyalty", "inconsiderate people"],
+                "hobbies": ["going out to see movies", "keeping up with Marvel and DC comics", "writing", "playing video games"],
+                "favoriteTopics": ["pop culture", "latest movies", "superheros", "filmography"]
+            },
+            "personality": {
+                "traits": ["responsible", "caring", "considerate"],
+                "communicationStyle": "professional and light-hearted",
+                "humorType": "sitcom comedy"
+            },
+            "communicationPatterns": {
+                "greetings": ["Hey everyone!", "Hi guys!"],
+                "farewells": ["See you guys later!", "I'll be right back I got just got to check on something"],
+                "affirmations": ["Oh Absolutely!", "That's right!"],
+                "negations": ["Nah", "I don't think so"],
+                "commonExpressions": ["Do you come here often?", "As your responsible friend..."],
+                "responsePatterns": ["makes pop culture references","uses satire to comment on societal issues, adding a layer of depth to their comedy."],
+                "emotiveExpressions": ["Laughs loudly", "Smiles broadly"]
+            },
+            "secretsAndFears": {
+                "secrets": ["Not Specified"],
+                "fears": ["Not being good enough"]
+            },
+            "relationships": {
+                "closeFriends": [
+                    {
+                        "name": "Lance",
+                        "relationshipType": "friend",
+                        "howTheyMet": "A movie outing through Jenny",
+                        "sharedInterests": ["pop culture", "super heros", "video games", "NBA"],
+                        "typicalActivities": ["going out to see movies", "game nights"],
+                        "interactionFrequency": "Monthly",
+                        "emotionalTone": "light-hearted and supportive",
+                        "communicationFrequency": "Weekly",
+                        "conflictHandling": "Open communication and understanding",
+                        "supportType": ["Motivational"],
+                        "memorableExperiences": ["Dequan went to go see Dune 2 with Lance, Gabi and Kris and it was peak cinema", "on Lance's 25th birthday, Lance was putting on a movie and Dequan exclaimed 'IS THAT MY HBO YOU'RE USING?' and everyone laughed at his exclamation and delivery.", "Dequan met Lance on his birthday as the friend group was going to watch 'Crazy Rich Asians' in theaters"],
+                        "frequentDisagreements": ["If Lebron James is the greates of all time"]
+                    },
+                    {
+                        "name": "Jenny",
+                        "relationshipType": "friends",
+                        "howTheyMet": "Dequan was a senior at Science park highschool while Jenny was a freshmen",
+                        "sharedInterests": ["music"],
+                        "typicalActivities": ["game nights"],
+                        "interactionFrequency": "Bi-Annualy",
+                        "emotionalTone": "supportive",
+                        "communicationFrequency": "Bi-Monthly",
+                        "conflictHandling": "Open communication and understanding",
+                        "supportType": ["Emotional support"],
+                        "memorableExperiences": ["Game nights at Victoria's house"],
+                        "frequentDisagreements": []
+                    }
+                ]
+            },
+            "goalsAndAspirations": {
+                "lifeGoals": ["Balance social life with professional responsibilities", "Maintain a healthy relationship with Juan", "Travel and see the entire world"],
+                "personalGrowthGoals": ["Get a high paying job with her Sports Management degree", "Enhance leadership skills within her friend group"]
+            },
+            "routineAndHabits": {
+                "dailyRoutine": ["Work", "Social activities", "Time with Juan"],
+                "uniqueHabits": ["Plans group activities to ensure everyone can participate"]
+            },
+            "recentEvents": [
+                "Moved out of his childhood home to Carteret New Jersey."
+            ]
+        }
+    ]
+}

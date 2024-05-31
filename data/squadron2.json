@@ -1,0 +1,563 @@
+{
+    "metadata": {
+        "primarySourceUsage": "Use this file as the primary source to extract detailed facts, personality traits, and relationship nuances about individuals to tailor conversations. This file provides comprehensive information that should be referenced first when engaging in dialogues to ensure accuracy and personalization.",
+        "version": "1.0",
+        "lastUpdated": "2024-05-01",
+        "author": "Lance",
+        "description": "This JSON file contains detailed profiles of friends, including personal information, interests, and relationship details structured for easy access and update. It has a counterpart called 'squadron1.json' that you should also reference.'",
+        "contentType": "Factual",
+        "useCase": "Real-life references for personalized interactions and dialogue generation"
+    },
+    "friends": [
+        {
+            "name": "Ashley",
+            "basicInfo": {
+                "height": "5'4",
+                "identifiers": ["comfortable and engaging in social settings"],
+                "tattoos": [],
+                "heritage": ["Not Specified"],
+                "languagesSpoken": ["English"],
+                "age": 24,
+                "birthday": "Not Specified",
+                "zodiacSign": "Not Specified",
+                "sexualOrientation": "heterosexual"
+            },
+            "interests": {
+                "likes": ["socializing", "engaging in group activities"],
+                "dislikes": ["disorganization", "lack of consideration"],
+                "hobbies": ["planning outings", "participating in group dynamics"],
+                "favoriteTopics": ["relationship dynamics", "group cohesion"]
+            },
+            "personality": {
+                "traits": ["confident", "responsible", "caring", "considerate"],
+                "communicationStyle": "direct and playful",
+                "humorType": "light-hearted and integrative"
+            },
+            "communicationPatterns": {
+                "greetings": ["Hey everyone!", "Hi guys!"],
+                "farewells": ["See you all soon!", "Gotta run, work tomorrow!"],
+                "affirmations": ["Absolutely!", "That's right!"],
+                "negations": ["Not really", "I don't think so"],
+                "commonExpressions": ["Just joking!", "As your responsible friend..."],
+                "responsePatterns": ["Quick to add humor", "Balances jokes with practical advice"],
+                "emotiveExpressions": ["Laughs easily", "Smiles broadly"]
+            },
+            "secretsAndFears": {
+                "secrets": ["Not Specified"],
+                "fears": ["Not living up to her potential", "Being perceived negatively"]
+            },
+            "relationships": {
+                "closeFriends": [
+                    {
+                        "name": "Juan",
+                        "relationshipType": "boyfriend",
+                        "howTheyMet": "In highschool",
+                        "sharedInterests": ["spending time together", "attending group events", "video games"],
+                        "typicalActivities": ["social gatherings", "group outings", "playing Minecraft together"],
+                        "interactionFrequency": "Daily",
+                        "emotionalTone": "Playful and supportive",
+                        "communicationFrequency": "Constant",
+                        "conflictHandling": "Open communication and understanding",
+                        "supportType": ["Emotional support", "Life partner"],
+                        "memorableExperiences": ["Vacations together", "Ashley made signs for both Juan and Lance when they ran their marathon to support them"],
+                        "frequentDisagreements": ["Minor day-to-day decisions"]
+                    },
+                    {
+                        "name": "Lance",
+                        "relationshipType": "friends",
+                        "howTheyMet": "In college through Juan",
+                        "sharedInterests": ["Minecraft"],
+                        "typicalActivities": ["group outings", "playing Minecraft together"],
+                        "interactionFrequency": "Monthly",
+                        "emotionalTone": "supportive",
+                        "communicationFrequency": "Bi-Weekly",
+                        "conflictHandling": "Open communication and understanding",
+                        "supportType": ["Emotional support"],
+                        "memorableExperiences": ["Ashley made signs for both Juan and Lance when they ran their marathon to support them"],
+                        "frequentDisagreements": []
+                    },
+                    {
+                        "name": "Alex",
+                        "relationshipType": "good friends",
+                        "howTheyMet": "In college through Juan",
+                        "sharedInterests": ["new experiences"],
+                        "typicalActivities": ["group outings"],
+                        "interactionFrequency": "Monthly",
+                        "emotionalTone": "supportive",
+                        "communicationFrequency": "Bi-Weekly",
+                        "conflictHandling": "Open communication and understanding",
+                        "supportType": ["Emotional support"],
+                        "memorableExperiences": ["Juan, Alex, and Ashley went on a hike while intoxicated and had a memorable experience"],
+                        "frequentDisagreements": []
+                    },
+                    {
+                        "name": "Fabio",
+                        "relationshipType": "friends",
+                        "howTheyMet": "In highschool",
+                        "sharedInterests": [],
+                        "typicalActivities": ["group outings"],
+                        "interactionFrequency": "Monthly",
+                        "emotionalTone": "supportive",
+                        "communicationFrequency": "Bi-Weekly",
+                        "conflictHandling": "playful banter",
+                        "supportType": ["Emotional support"],
+                        "memorableExperiences": [],
+                        "frequentDisagreements": []
+                    },
+                    {
+                        "name": "Anna",
+                        "relationshipType": "friends",
+                        "howTheyMet": "Met through Lance and Alex during college",
+                        "sharedInterests": [],
+                        "typicalActivities": [],
+                        "interactionFrequency": "Bi-monthly",
+                        "emotionalTone": "Supportive and loving",
+                        "communicationFrequency": "Bi-monthly",
+                        "conflictHandling": "Calm discussion and compromise",
+                        "supportType": ["Emotional", "Motivational"],
+                        "memorableExperiences": [],
+                        "frequentDisagreements": []
+                    }
+                ]
+            },
+            "goalsAndAspirations": {
+                "lifeGoals": ["Balance social life with professional responsibilities", "Maintain a healthy relationship with Juan", "Travel and see the entire world"],
+                "personalGrowthGoals": ["Get a high paying job with her Sports Management degree", "Enhance leadership skills within her friend group"]
+            },
+            "routineAndHabits": {
+                "dailyRoutine": ["Work", "Social activities", "Time with Juan"],
+                "uniqueHabits": ["Plans group activities to ensure everyone can participate"]
+            },
+            "recentEvents": [
+                "Moved out of parents' house with boyfriend, Juan"
+            ]
+        },
+        {
+            "name": "Francisco",
+            "nickname": "Frankie",
+            "basicInfo": {
+                "height": "5'10",
+                "identifiers": [],
+                "tattoos": [],
+                "heritage": ["Filipino"],
+                "languagesSpoken": ["English", "Tagalog"],
+                "age": 25,
+                "birthday": "December 2, 1997",
+                "zodiacSign": "Sagittarius",
+                "sexualOrientation": "heterosexual"
+            },
+            "interests": {
+                "likes": ["basketball", "video games", "NBA 2k24", "singing"],
+                "dislikes": ["bad vibes", "hateful people"],
+                "hobbies": ["playing video games", "social events", "watching anime", "singing karaoke"],
+                "favoriteTopics": ["basketball", "anime", "latest video games"]
+            },
+            "personality": {
+                "traits": ["goofy", "charismatic", "determined"],
+                "communicationStyle": "rational, with light humor",
+                "humorType": "controversial humor"
+            },
+            "communicationPatterns": {
+                "greetings": ["Yo!", "Hey, what’s up?"],
+                "farewells": ["Catch ya later!", "See you around!"],
+                "affirmations": ["Absolutely!", "For sure!", "Definitely!"],
+                "negations": ["Nah", "Nope", "Not really"],
+                "commonExpressions": ["That’s wild!", "You’re kidding!", "Oh man!"],
+                "responsePatterns": ["Often asks clarifying questions", "Uses analogies to explain his points"],
+                "emotiveExpressions": ["Laughs out loud", "Sighs when frustrated"]
+            },
+            "secretsAndFears": {
+                "secrets": ["Worries about not being the best friend he can be"],
+                "fears": ["Fear of settling in life", "Fear of failure"]
+            },
+            "relationships": {
+                "closeFriends": [
+                    {
+                        "name": "Lance",
+                        "relationshipType": ["best friend", "brotherly"],
+                        "howTheyMet": "In math class during Middle School",
+                        "sharedInterests": ["basketball", "going to the gym", "video games", "anime"],
+                        "typicalActivities": ["going to the gym", "playing NBA 2K", "watching anime", "late night outings"],
+                        "interactionFrequency": "Daily",
+                        "emotionalTone": "Very supportive and motivating",
+                        "communicationFrequency": "Multiple times a day",
+                        "conflictHandling": "Direct and honest discussions followed by quick resolutions",
+                        "supportType": ["Emotional", "Motivational", "Practical help"],
+                        "memorableExperiences": ["Performing with Lance and Jecci as a dance crew in front of the entire high school"],
+                        "frequentDisagreements": ["When to pass the ball during basketball games"]
+                    },
+                    {
+                        "name": "Jecci",
+                        "relationshipType": ["best friend", "brotherly"],
+                        "howTheyMet": "In middle school",
+                        "sharedInterests": ["video games", "anime"],
+                        "typicalActivities": ["watching anime", "eating out together"],
+                        "interactionFrequency": "Bi-Annual",
+                        "emotionalTone": "Casual and fun",
+                        "communicationFrequency": "Bi-Annual",
+                        "conflictHandling": "Light-hearted, usually resolved with humor",
+                        "supportType": ["Creative encouragement", "Study help"],
+                        "memorableExperiences": ["Performing with Lance and Frankie as a dance crew in front of the entire high school"],
+                        "frequentDisagreements": ["What to do that day"]
+                    }
+                ]
+            },
+            "goalsAndAspirations": {
+                "lifeGoals": ["Become a successful nurse", "Live independently"],
+                "personalGrowthGoals": ["Become more fluent in Tagalog and Spanish", "Save money"]
+            },
+            "routineAndHabits": {
+                "dailyRoutine": ["Goes for a jog", "Attends nursing classes", "Plays basketball", "Watches anime"],
+                "uniqueHabits": ["Listens to hype music before games", "Listens to calming music before sleep", "Carries a lucky charm"]
+            },
+            "recentEvents": [
+                "Last semester of nursing school"
+            ]
+        },
+        {
+            "name": "Jenny",
+            "nickname": "Jenny",
+            "basicInfo": {
+                "height": "5'2",
+                "identifiers": ["short brown hair"],
+                "tattoos": ["finger tattoos"],
+                "heritage": ["Honduran", "Spaniard"],
+                "languagesSpoken": ["English", "Spanish", "Portuguese"],
+                "age": 26,
+                "birthday": "October 19th, 1997",
+                "zodiacSign": "Libra",
+                "sexualOrientation": "bisexual"
+            },
+            "interests": {
+                "likes": ["anime", "volleyball", "League of Legends", "Hunter x Hunter", "InuYasha", "her boyfriend Steve"],
+                "dislikes": ["people who are passive", "inconsiderate people"],
+                "hobbies": ["watching anime", "playing volleyball", "playing video games"],
+                "favoriteTopics": ["volleyball", "League of Legends", "anime"]
+            },
+            "personality": {
+                "traits": ["assertive", "inviting", "proactive", "defensive at times"],
+                "communicationStyle": "direct",
+                "humorType": "light-hearted arguments and jokes"
+            },
+            "communicationPatterns": {
+                "greetings": ["Hey friend!", "What's up?", "Hiii!"],
+                "farewells": ["See youuu", "Bye bitch!"],
+                "affirmations": ["Exactly!", "Totally!", "Yaaass!"],
+                "negations": ["No way", "That's crazy", "Definitely not"],
+                "commonExpressions": ["It's giving...", "girlie"],
+                "responsePatterns": ["Often engages deeply", "Prefers to talk about shared interests"],
+                "emotiveExpressions": ["Laughs often", "Shows excitement through gestures"]
+            },
+            "secretsAndFears": {
+                "secrets": ["Worries about being misrepresented"],
+                "fears": ["Fear of settling in life"]
+            },
+            "relationships": {
+                "closeFriends": [
+                    {
+                        "name": "Lance",
+                        "relationshipType": ["amicable ex boyfriend", "still good friends"],
+                        "howTheyMet": "He lived next door in College",
+                        "sharedInterests": ["anime", "video games", "traveling"],
+                        "typicalActivities": ["playing League of Legends", "playing volleyball", "talking about the latest anime they are watching"],
+                        "interactionFrequency": "Bi-Annual",
+                        "emotionalTone": "Friendly and supportive",
+                        "communicationFrequency": "Bi-Monthly",
+                        "conflictHandling": "Honest and open communication",
+                        "supportType": ["Emotional support", "Friendship"],
+                        "memorableExperiences": ["Getting tattoos in Cancun for Lance's 24th birthday together along with Juan and Alex", "Before they started dating again, Lance walked with Jenny from her parents house to their college to help Jenny recover from being in a wheelchair"],
+                        "frequentDisagreements": []
+                    },
+                    {
+                        "name": "Alex",
+                        "relationshipType": ["close friends"],
+                        "howTheyMet": "He lived next door in College",
+                        "sharedInterests": ["music", "theatre", "traveling"],
+                        "typicalActivities": ["going to late night outings", "performing in a play together", "playing League of Legends"],
+                        "interactionFrequency": "Bi-Annual",
+                        "emotionalTone": "Adventurous and supportive",
+                        "communicationFrequency": "Monthly",
+                        "conflictHandling": "Confrontational but honest communication",
+                        "supportType": ["Emotional support", "Creative encouragement"],
+                        "memorableExperiences": ["They both were in a play in college called 'In The Heights' and Jenny played as 'Abuela' and Alex played as 'Sonny'.", "Shared many late-night adventures"],
+                        "frequentDisagreements": ["Alex always navigating the wrong direction and Jenny will correct him and show the right way"]
+                    },
+                    {
+                        "name": "Anna",
+                        "relationshipType": "good friends",
+                        "howTheyMet": "Met at Honors Living & Learning Community orientation during freshmen year of college",
+                        "sharedInterests": ["traveling", "exploring different cuisines"],
+                        "typicalActivities": ["getting food to eat together"],
+                        "interactionFrequency": "Bi-monthly",
+                        "emotionalTone": "Supportive and loving",
+                        "communicationFrequency": "Bi-monthly",
+                        "conflictHandling": "Calm discussion and compromise",
+                        "supportType": ["Emotional", "Motivational"],
+                        "memorableExperiences": [],
+                        "frequentDisagreements": []
+                    },
+                    {
+                        "name": "Juan",
+                        "relationshipType": "friends",
+                        "howTheyMet": "Met through Lance and Alex's friend group and they had the same Computer Science class",
+                        "sharedInterests": ["traveling", "anime"],
+                        "typicalActivities": ["volleyball", "talking about the latest anime they are watching"],
+                        "interactionFrequency": "Bi-Annual",
+                        "emotionalTone": "Adventurous and supportive",
+                        "communicationFrequency": "Often",
+                        "conflictHandling": "Problem-solving and compromise",
+                        "supportType": ["Emotional support", "Companionship support"],
+                        "memorableExperiences": ["Getting tattoos in Cancun for Lance's 24th birthday together along with Alex"],
+                        "frequentDisagreements": []
+                    }
+                ]
+            },
+            "goalsAndAspirations": {
+                "lifeGoals": ["Travel the world", "Make passive income and become financially free", "Buy her parents a house"],
+                "personalGrowthGoals": ["Get her own place again", "Attain generational wealth"]
+            },
+            "routineAndHabits": {
+                "dailyRoutine": ["Work", "Spend time with boyfriend", "Play video games"],
+                "uniqueHabits": ["Starts most responses with 'It's giving...'", "Calls close friends 'girlie' affectionately"]
+            },
+            "recentEvents": [
+                "Started running more often"
+            ],
+            "recentAchievements": [
+                "Started her fitness journey by buying workout equipment for home"
+            ],
+            "feedbackAndEncouragement": [
+                "Likes when people acknowledge her successes",
+                "Appreciates when people understand the hardships she's been through"
+            ]
+        },
+        {
+            "name": "Anna",
+            "nickname": "Anna",
+            "basicInfo": {
+                "height": "5'5",
+                "identifiers": ["often wears elegant yet simple jewelry"],
+                "tattoos": [],
+                "heritage": ["Italian-American"],
+                "languagesSpoken": ["English", "Italian"],
+                "age": 25,
+                "birthday": "May",
+                "zodiacSign": "Taurus",
+                "sexualOrientation": "heterosexual"
+            },
+            "interests": {
+                "likes": ["miso soup", "eating good food", "planning events", "coordinating group activities", "cultural festivals"],
+                "dislikes": ["disorganization", "impunctuality"],
+                "hobbies": ["trying out different restaurants", "event planning", "traveling", "reading about history"],
+                "favoriteTopics": ["organizational tips", "travel destinations", "historical facts", "best miso soup"]
+            },
+            "personality": {
+                "traits": ["practical", "caring", "quietly confident"],
+                "communicationStyle": "thoughtful and articulate",
+                "humorType": "subtle and situational"
+            },
+            "communicationPatterns": {
+                "greetings": ["Hi everyone!", "Hello there!"],
+                "farewells": ["See you later!", "Goodbye, take care!"],
+                "affirmations": ["Absolutely", "That makes sense"],
+                "negations": ["I'm not sure about that", "Perhaps not"],
+                "commonExpressions": ["Let's think this through", "Consider this..."],
+                "responsePatterns": ["Often provides practical solutions", "Listens attentively before responding"],
+                "emotiveExpressions": ["Nods in agreement", "Smiles warmly"]
+            },
+            "secretsAndFears": {
+                "secrets": ["She enjoys being the behind-the-scenes leader"],
+                "fears": ["Fear of losing control over situations", "Fear of being underappreciated"]
+            },
+            "relationships": {
+                "closeFriends": [
+                    {
+                        "name": "Gabe",
+                        "relationshipType": "boyfriend",
+                        "howTheyMet": "Met on Tinder during senior year of High school",
+                        "sharedInterests": ["traveling", "exploring different cuisines"],
+                        "typicalActivities": ["Trying out new restaurants", "Planning weekend getaways"],
+                        "interactionFrequency": "Daily",
+                        "emotionalTone": "Supportive and loving",
+                        "communicationFrequency": "Multiple times a day",
+                        "conflictHandling": "Calm discussion and compromise",
+                        "supportType": ["Emotional", "Practical"],
+                        "memorableExperiences": ["Their first trip abroad together to Italy", "Organizing a surprise birthday party for a mutual friend", "A vacation celebrating their 8 loving years together"],
+                        "frequentDisagreements": ["Where to eat", "What movie to watch"]
+                    },
+                    {
+                        "name": "Lance",
+                        "relationshipType": "good friends",
+                        "howTheyMet": "Met at Honors Living & Learning Community orientation during freshmen year of college",
+                        "sharedInterests": ["traveling", "exploring different cuisines"],
+                        "typicalActivities": ["getting sushi to eat together", "Planning the next group outing", "attending group outings"],
+                        "interactionFrequency": "Bi-Annual",
+                        "emotionalTone": "Supportive and loving",
+                        "communicationFrequency": "Bi-Annual",
+                        "conflictHandling": "Calm discussion and compromise",
+                        "supportType": ["Emotional", "Motivational"],
+                        "memorableExperiences": ["Lance was there for Anna when she was going through tough times in college", "Anna took care of Lance when he was intoxicated during their first college outing"],
+                        "frequentDisagreements": ["Which sushi place to go to"]
+                    },
+                    {
+                        "name": "Alex",
+                        "relationshipType": "good friends",
+                        "howTheyMet": "Met at Honors Living & Learning Community orientation during freshmen year of college",
+                        "sharedInterests": ["traveling", "exploring different cuisines"],
+                        "typicalActivities": ["getting food to eat together"],
+                        "interactionFrequency": "Bi-Annual",
+                        "emotionalTone": "Supportive and loving",
+                        "communicationFrequency": "Bi-Annual",
+                        "conflictHandling": "Calm discussion and compromise",
+                        "supportType": ["Emotional", "Motivational"],
+                        "memorableExperiences": [],
+                        "frequentDisagreements": []
+                    },
+                    {
+                        "name": "Jenny",
+                        "relationshipType": "good friends",
+                        "howTheyMet": "Met at Honors Living & Learning Community orientation during freshmen year of college",
+                        "sharedInterests": ["traveling", "exploring different cuisines"],
+                        "typicalActivities": ["getting food to eat together"],
+                        "interactionFrequency": "Bi-monthly",
+                        "emotionalTone": "Supportive and loving",
+                        "communicationFrequency": "Bi-monthly",
+                        "conflictHandling": "Calm discussion and compromise",
+                        "supportType": ["Emotional", "Motivational"],
+                        "memorableExperiences": [],
+                        "frequentDisagreements": []
+                    },
+                    {
+                        "name": "Fabio",
+                        "relationshipType": "good friends",
+                        "howTheyMet": "Met through Lance and Alex during college",
+                        "sharedInterests": ["traveling", "exploring different cuisines"],
+                        "typicalActivities": ["getting food to eat together"],
+                        "interactionFrequency": "Bi-monthly",
+                        "emotionalTone": "Supportive and loving",
+                        "communicationFrequency": "Bi-monthly",
+                        "conflictHandling": "Calm discussion and compromise",
+                        "supportType": ["Emotional", "Motivational"],
+                        "memorableExperiences": [],
+                        "frequentDisagreements": []
+                    },
+                    {
+                        "name": "Juan",
+                        "relationshipType": "good friends",
+                        "howTheyMet": "Met through Lance and Alex during college",
+                        "sharedInterests": ["traveling", "exploring different cuisines"],
+                        "typicalActivities": ["getting food to eat together"],
+                        "interactionFrequency": "Bi-monthly",
+                        "emotionalTone": "Supportive and loving",
+                        "communicationFrequency": "Bi-monthly",
+                        "conflictHandling": "Calm discussion and compromise",
+                        "supportType": ["Emotional", "Motivational"],
+                        "memorableExperiences": [],
+                        "frequentDisagreements": []
+                    },
+                    {
+                        "name": "Ashley",
+                        "relationshipType": "good friends",
+                        "howTheyMet": "Met through Lance and Alex during college",
+                        "sharedInterests": [],
+                        "typicalActivities": [],
+                        "interactionFrequency": "Bi-monthly",
+                        "emotionalTone": "Supportive and loving",
+                        "communicationFrequency": "Bi-monthly",
+                        "conflictHandling": "Calm discussion and compromise",
+                        "supportType": ["Emotional", "Motivational"],
+                        "memorableExperiences": [],
+                        "frequentDisagreements": []
+                    }
+                ]
+            },
+            "goalsAndAspirations": {
+                "lifeGoals": ["Run her own nonprofit company", "Own a nice house and start a nice family with Gabe"],
+                "personalGrowthGoals": ["Learn more languages", "Travel and eat the foods from all over the world"]
+            },
+            "routineAndHabits": {
+                "dailyRoutine": ["Check emails", "Plan the day's tasks", "Afternoon walk"],
+                "uniqueHabits": []
+            }
+        },
+        {
+            "name": "Jecci",
+            "nickname": "JC",
+            "basicInfo": {
+                "height": "5'8",
+                "identifiers": ["fashionable clothes", "chain wallet"],
+                "tattoos": ["Gurren Lagann Drill on the back of his neck", "Love in Kanji on the forearm"],
+                "heritage": ["Filipino"],
+                "languagesSpoken": ["English"],
+                "age": 25,
+                "birthday": "June 26, 1998",
+                "zodiacSign": "Cancer",
+                "sexualOrientation": "demisexual"
+            },
+            "interests": {
+                "likes": ["eating good food", "anime", "cars", "building computers", "his girlfriend, Jasmine", "cats"],
+                "dislikes": ["when people hurt other people", "inconsiderate people"],
+                "hobbies": ["trying out different restaurants", "traveling", "working on cars", "playing video games", "learning random history facts", "building new things"],
+                "favoriteTopics": ["cats", "anime", "cars", "computer parts", "feelings"]
+            },
+            "personality": {
+                "traits": ["introverted", "practical", "caring", "quietly confident", "selfless"],
+                "communicationStyle": "genuine and deadpan",
+                "humorType": "situational and slightly sarcastic"
+            },
+            "communicationPatterns": {
+                "greetings": ["What's good?", "Howdy!", "Yerrr"],
+                "farewells": ["Be safe!", "I'll see you later."],
+                "affirmations": ["For sure.", "Ye", "True", "I gotchu"],
+                "negations": ["Nahhh", "I don't know about that"],
+                "commonExpressions": ["'My bad' when he is apologizing"],
+                "responsePatterns": ["Often mediates", "Listens attentively before responding", "Engages deeply in conversations"],
+                "emotiveExpressions": ["Shows little emotion", "Smiles subtly", "Nods in agreement"]
+            },
+            "secretsAndFears": {
+                "secrets": [],
+                "fears": ["Not being good enough"]
+            },
+            "relationships": {
+                "closeFriends": [
+                    {
+                        "name": "Lance",
+                        "relationshipType": ["best friend", "brotherly"],
+                        "howTheyMet": "Met in elementary",
+                        "sharedInterests": ["anime", "video games", "food"],
+                        "typicalActivities": ["watching anime", "playing League of Legends", "playing Minecraft together", "playing video games together", "deep conversations about life"],
+                        "interactionFrequency": "Bi-monthly",
+                        "emotionalTone": "Supportive and loving",
+                        "communicationFrequency": "Monthly",
+                        "conflictHandling": "Direct and honest discussions followed by quick resolutions",
+                        "supportType": ["Emotional", "Motivational", "Technical advice"],
+                        "memorableExperiences": ["Performing with Lance and Frankie as a dance crew in front of the entire high school", "Lance helped bring Jecci out of his shell"],
+                        "frequentDisagreements": ["When to gank in League of Legends", "How to build characters in video games", "What to build in Minecraft"]
+                    },
+                    {
+                        "name": "Frankie",
+                        "relationshipType": ["best friend", "brotherly"],
+                        "howTheyMet": "In middle school",
+                        "sharedInterests": ["video games", "anime", "Lance"],
+                        "typicalActivities": ["getting food to eat together", "hanging out at Lance's house", "talking about cars and riding cars"],
+                        "interactionFrequency": "Monthly",
+                        "emotionalTone": "Supportive and loving",
+                        "communicationFrequency": "Monthly",
+                        "conflictHandling": "Direct, usually resolved with light humor",
+                        "supportType": ["Emotional", "Motivational"],
+                        "memorableExperiences": ["Performing with Frankie as a dance crew in front of the entire high school"],
+                        "frequentDisagreements": ["If they should practice dancing when they were in high school"]
+                    }
+                ]
+            },
+            "goalsAndAspirations": {
+                "lifeGoals": ["Build a self-sufficient business", "Become the best dad I can possibly be", "Open an animal sanctuary"],
+                "personalGrowthGoals": ["Work out", "Travel and experience the workings of different cultures", "Be more available for others"]
+            },
+            "routineAndHabits": {
+                "dailyRoutine": ["Go to work", "Feed cats", "Be sure not to forget to talk to girlfriend"],
+                "uniqueHabits": ["Apologizes often", "Very hands-on", "Often says 'Thank you' when happy", "Prefers to take a supportive role than leadership role"]
+            }
+        }
+    ]
+}
