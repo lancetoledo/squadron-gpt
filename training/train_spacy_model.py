@@ -16,7 +16,7 @@ textcat.add_label("general_inquiry")
 textcat.add_label("feedback")  # Added new label
 
 # Load training data
-with open("training_data.json", "r") as file:
+with open("training/training_data.json", "r") as file:
     TRAINING_DATA = json.load(file)
 
 # Split data into training and validation sets
@@ -68,7 +68,7 @@ for epoch in range(n_epochs):
         best_loss = val_loss
         no_improvement_epochs = 0
         # Save the best model
-        nlp.to_disk("best_relationship_inquiry_model")
+        nlp.to_disk("models/best_relationship_inquiry_model")
     else:
         no_improvement_epochs += 1
 
@@ -77,4 +77,4 @@ for epoch in range(n_epochs):
         break
 
 # Save the final model
-nlp.to_disk("relationship_inquiry_model")
+nlp.to_disk("models/relationship_inquiry_model")

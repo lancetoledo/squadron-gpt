@@ -1,0 +1,10 @@
+{
+  "labels":[
+    "relationship_inquiry",
+    "friend_inquiry",
+    "general_inquiry",
+    "feedback"
+  ],
+  "threshold":0.0,
+  "positive_label":null
+}
