@@ -1,16 +1,17 @@
 import json
 import os
 from docx import Document
+from config import RELATIONSHIPS_DATA1, RELATIONSHIPS_DATA2, FRIEND_DATA1, FRIEND_DATA2
 
-def load_json_files(directory, file_pattern):
+def load_json_files(directory):
     # Initialize data structure to hold friends and relationships data
-    data = {"friends": [], "lance_relationships": []}
-    # List of JSON files to be loaded
+    data = {"friends": [], "relationships": []}
+    # List of JSON files to be loaded from environment variables
     json_files = [
-        "Lance_Relationships_Detailed.json",
-        "Navi_Relationships_Detailed.json",
-        "squadron1.json",
-        "squadron2.json"
+        RELATIONSHIPS_DATA1,
+        RELATIONSHIPS_DATA2,
+        FRIEND_DATA1,
+        FRIEND_DATA2
     ]
     # Iterate through each JSON file
     for file_name in json_files:
@@ -23,7 +24,7 @@ def load_json_files(directory, file_pattern):
                 if "friends" in file_data:
                     data["friends"].extend(file_data.get("friends", []))
                 if "relationships" in file_data:
-                    data["lance_relationships"].append(file_data)
+                    data["relationships"].append(file_data)
         except json.JSONDecodeError as e:
             # Handle JSON decoding errors
             print(f"Error decoding JSON from file {file_name}: {e}")

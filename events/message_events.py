@@ -3,7 +3,7 @@ import discord
 import openai
 import os
 import asyncio
-from config import OPENAI_API_KEY
+from config import OPENAI_API_KEY, STATIC_FRIEND_DATA, DISCORD_TO_REAL_NAME
 from utils.feedback_utils import save_feedback
 from text_processing.text_utils import truncate_text
 from text_processing.relationship_detection import is_relationship_inquiry, is_friend_inquiry, is_feedback
@@ -16,37 +16,35 @@ from text_processing.spacy_setup import nlp
 openai.api_key = OPENAI_API_KEY
 
 # Load JSON data from the data directory
-friend_data_json = load_json_files("data", "*.json")
+# Change 'data' to 'sample_data' after you added your personal data to the json files.
+friend_data_json = load_json_files("data")
 
 # Initialize dictionaries for session histories and contexts
 session_histories = {}
 session_contexts = {}
 
-# Static JSON object with predefined friend names
-static_friend_data = {
-    "friends": [
-        {"name": "Christian"},
-        {"name": "Julia"},
-        {"name": "Rizelyn"}
-    ]
-}
+# Placeholder examples for static friend data and discord to real name mapping
+# Users should replace these with their actual data in the .env file
 
-# Hardcoded mapping of Discord usernames to real names
-discord_to_real_name = {
-    "l3d0": "Lance",
-    "atomichi": "Juan",
-    "fabsesports": "Fabio",
-    "yenyverse": "Jenny",
-    "ashleyyjennaa": "Ashley",
-    "naviixg": "Navjot"
-}
+# Static friend data is for uncommon names or cultural names that aren't being detected by NER like "Fabriccio" or "Pragg"
+# STATIC_FRIEND_DATA = [
+#     {"name": "Christian"},
+#     {"name": "Justine"},
+#     {"name": "Bob"}
+# ]
+
+# This is used so the bot can recognize discord users to their real names so the bot can search it's data set for them.
+# DISCORD_TO_REAL_NAME = {
+#     "noobmaster69": "Korg",
+#     "thechosenone": "Neo",
+# }
 
 # Function to extract friend names from JSON files and static data
 def extract_friend_names():
     friend_names = set()
     nickname_to_full_name = {}
 
-    for friend in static_friend_data["friends"]:
+    for friend in STATIC_FRIEND_DATA:
         name = friend.get("name", "").lower()
         if name:
             friend_names.add(name)
@@ -60,7 +58,7 @@ def extract_friend_names():
             friend_names.add(nickname)
             nickname_to_full_name[nickname] = name
 
-    for relationship_data in friend_data_json.get("lance_relationships", []):
+    for relationship_data in friend_data_json.get("relationships", []):
         for relationship in relationship_data.get("relationships", []):
             name = relationship.get("name", "").lower()
             nickname = relationship.get("nickname", "").lower()
@@ -89,7 +87,7 @@ def replace_nicknames(user_input):
 
 # Function to retrieve data for a specific friend from JSON files and static data
 def get_friend_data(friend_name):
-    for friend in static_friend_data["friends"]:
+    for friend in STATIC_FRIEND_DATA:
         if friend.get("name").lower() == friend_name.lower():
             return friend
 
@@ -112,8 +110,8 @@ def find_relationships(person_name, target_friend_name):
                         relationships_info["primary"] = close_friend
                         break
 
-    # Extract detailed relationships from lance_relationships section
-    for relationship_data in friend_data_json.get("lance_relationships", []):
+    # Extract detailed relationships from relationships section
+    for relationship_data in friend_data_json.get("relationships", []):
         if relationship_data["name"].lower() == person_name.lower():
             for rel in relationship_data.get("relationships", []):
                 if rel["name"].lower() == target_friend_name.lower():
@@ -234,15 +232,13 @@ async def on_message(bot, message):
         user_input = message.content[5:].strip()
         print(f"User input after trimming '!talk': {user_input}")
 
-
-
         discord_name = message.author.name
         channel_id = message.channel.id
         session_id = str(channel_id)  # Use channel ID as session ID
 
         print(f"Discord name: {discord_name}, Channel ID: {channel_id}, Session ID: {session_id}")
 
-        friend_name = discord_to_real_name.get(discord_name, discord_name)  # Use Discord username if real name is not found
+        friend_name = DISCORD_TO_REAL_NAME.get(discord_name, discord_name)  # Use Discord username if real name is not found
         primary_person = friend_name.lower()
         print(f"Friend name: {friend_name}, Primary person: {primary_person}")
 
