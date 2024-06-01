@@ -99,6 +99,8 @@ def get_friend_data(friend_name):
 
 # Function to find relationships for a specific person and target
 def find_relationships(person_name, target_friend_name):
+
+    print(f"Finding relationship for {person_name} and {target_friend_name}")
     relationships_info = {}
 
     # Extract relationships from friends section
@@ -288,7 +290,7 @@ async def on_message(bot, message):
                         "last_inquiry": "relationship",
                         "primary_person": primary_person
                     }
-                    print(f"Relationship context for {friend_name}: {response_context}")
+                    print(f"Relationship JSON retrieved: {response_context}")
                 else:
                     response_context = relationship_info
                     print(f"Relationship inquiry response: {response_context}")
