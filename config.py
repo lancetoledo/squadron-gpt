@@ -3,6 +3,10 @@
 # OpenAI and ElevenLabs API keys
 OPENAI_API_KEY = 'sk-proj-dWyp00x40uLcbwZEwlQHT3BlbkFJbvxteik68dUTucV4Mh77'
 ELEVENLABS_API_KEY = '2e9301ac102897ec1d05bc1ec194c518'
+# Custom Brendan Voice:
+# ELEVENLABS_VOICE_ID = 'OQ9vgPN68ly6P7YjwRpa'
+# Funny British Timmy Voice:
+# ELEVENLABS_VOICE_ID = 'chcMmmtY1cmQh2ye1oXi' 
 # Regular British Voice
 ELEVENLABS_VOICE_ID = 'z0DcTcYlLxVjFO7tr9yB' 
 ELEVENLABS_API_URL = f'https://api.elevenlabs.io/v1/text-to-speech/{ELEVENLABS_VOICE_ID}'

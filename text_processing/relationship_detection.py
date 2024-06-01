@@ -4,9 +4,11 @@ from text_processing.spacy_setup import nlp  # Ensure nlp is loaded correctly
 # Load spaCy model for relationship detection
 relationship_model = spacy.load("models/best_relationship_inquiry_model")
 
+# Function to check if the user input is a relationship inquiry
 def is_relationship_inquiry(user_input):
     doc = relationship_model(user_input)
     score = doc.cats["relationship_inquiry"]
+    print(f"Relationship inquiry score: {score}")
     return score > 0.5
 
 # Function to detect if the inquiry is about a friend
@@ -30,7 +32,9 @@ def is_friend_inquiry(user_input, known_friend_names):
     print(f"Checking if any entities match known friend names: {known_friend_names}")
     return False  # Ensure function returns False if no matches found
 
+# Function to check if the user input is feedback
 def is_feedback(user_input):
     doc = relationship_model(user_input)
     score = doc.cats["feedback"]
+    print(f"Feedback score: {score}")
     return score > 0.5
