@@ -3,7 +3,7 @@ import discord
 import openai
 import os
 import asyncio
-from config import OPENAI_API_KEY, ELEVENLABS_API_KEY, ELEVENLABS_API_URL
+from config import OPENAI_API_KEY
 from utils.feedback_utils import save_feedback
 from text_processing.text_utils import truncate_text
 from text_processing.relationship_detection import is_relationship_inquiry, is_friend_inquiry, is_feedback
@@ -12,8 +12,11 @@ from utils.context_management import update_history_with_extracted_info, truncat
 from tts.elevenlabs_tts import generate_custom_tts
 from text_processing.spacy_setup import nlp
 
-# Load JSON data from multiple files
-friend_data_json = load_json_files("*.json")
+# Set the OpenAI API key
+openai.api_key = OPENAI_API_KEY
+
+# Load JSON data from the data directory
+friend_data_json = load_json_files("data", "*.json")
 
 # Initialize dictionaries for session histories and contexts
 session_histories = {}
@@ -91,7 +94,7 @@ def get_friend_data(friend_name):
             return friend
 
     for friend in friend_data_json.get("friends", []):
-        if friend.get("name").lower() == friend_name.lower()):
+        if friend.get("name").lower() == friend_name.lower():
             return friend
 
     return {}
@@ -211,7 +214,7 @@ def check_sensitive_topics(context, user_input):
                 context = context.replace(phrase, "[redacted]")
             context = context.replace("ex-girlfriend, now friends", "friends")
             context = context.replace("ex-girlfriend", "friend")
-            context.replace("new boyfriend", "friend")
+            context = context.replace("new boyfriend", "friend")
             context = context.replace("broke up", "had a disagreement")
             context = context.replace("started dating", "became closer friends")
             context = context.replace("romantic feelings", "strong feelings")
@@ -220,63 +223,89 @@ def check_sensitive_topics(context, user_input):
 
 # Event triggered when a message is received
 async def on_message(bot, message):
+    print(f"on_message triggered by: {message.author.name}, content: {message.content}")
+
     if message.author == bot.user or not message.content.startswith('!talk'):
+        print("Message is from bot or does not start with '!talk'")
         await bot.process_commands(message)
         return
 
     async with message.channel.typing():
         user_input = message.content[5:].strip()
+        print(f"User input after trimming '!talk': {user_input}")
+
+
+
         discord_name = message.author.name
         channel_id = message.channel.id
         session_id = str(channel_id)  # Use channel ID as session ID
 
+        print(f"Discord name: {discord_name}, Channel ID: {channel_id}, Session ID: {session_id}")
+
         friend_name = discord_to_real_name.get(discord_name, discord_name)  # Use Discord username if real name is not found
         primary_person = friend_name.lower()
+        print(f"Friend name: {friend_name}, Primary person: {primary_person}")
 
         user_input = replace_nicknames(user_input)
+        print(f"User input after replacing nicknames: {user_input}")
 
         if session_id not in session_histories:
             session_histories[session_id] = []
             session_contexts[session_id] = {}
+            print(f"Initialized session history and context for session ID: {session_id}")
+
+        messages_to_send = []
+        audio_path = None
 
         try:
             if is_feedback(user_input):
+                print("Detected feedback in user input")
                 save_feedback(user_input, discord_name)
                 await message.channel.send("Thank you for the feedback. It has been noted.")
                 return
 
             if is_relationship_inquiry(user_input):
+                print("Detected relationship inquiry in user input")
                 relationship_info = handle_relationship_inquiry(user_input, friend_name, primary_person)
 
                 if relationship_info is None:
                     response_context = f"Sorry, I don't understand the request."
+                    print("Relationship inquiry resulted in no information")
                 elif isinstance(relationship_info, dict):
                     response_context = relationship_info
                     session_contexts[session_id] = {
                         "last_inquiry": "relationship",
                         "primary_person": primary_person
                     }
+                    print(f"Relationship context for {friend_name}: {response_context}")
                 else:
                     response_context = relationship_info
-            elif is_friend_inquiry(user_input):
+                    print(f"Relationship inquiry response: {response_context}")
+            elif is_friend_inquiry(user_input, known_friend_names):
+                print("Detected friend inquiry in user input")
                 friend_data = handle_friend_inquiry(user_input, friend_name)
 
                 if friend_data is None:
                     response_context = f"Sorry, I don't understand the request."
+                    print("Friend inquiry resulted in no information")
                 else:
                     response_context = friend_data
+                    print(f"Friend data for {friend_name}: {response_context}")
             else:
                 user_data = get_friend_data(friend_name)
                 response_context = user_data
+                print(f"General inquiry response for {friend_name}: {response_context}")
 
             # Apply guardrails for sensitive topics
             response_context = check_sensitive_topics(json.dumps(response_context, indent=2), user_input)
+            # print(f"Response context after applying sensitive topic guardrails: {response_context}")
 
             # Summarize conversation history to maintain context
             session_histories[session_id] = update_history_with_extracted_info(session_histories[session_id], user_input, response_context)
             conversation_history = session_histories[session_id]
             conversation_history.append({"role": "system", "content": summarize_conversation(session_histories[session_id])})
             conversation_history = truncate_history(conversation_history)
+            # print(f"Conversation history: {conversation_history}")
 
             # Custom GPT simulation context for Brendan with expanded detail
             brendan_context = f"""
@@ -294,22 +323,31 @@ async def on_message(bot, message):
                 Context: {truncate_text(json.dumps(response_context, indent=2))}
                 """
 
+            # print(f"Brendan context: {brendan_context}")
+
             response = openai.ChatCompletion.create(
                 model="gpt-4o",
                 messages=conversation_history + [{"role": "system", "content": brendan_context}, {"role": "user", "content": user_input}]
             )
+            print(f"OpenAI response: {response}")
+
             session_histories[session_id].append({"role": "assistant", "content": response['choices'][0]['message']['content']})
             # Ensure response is within the character limit for Discord
             messages_to_send = split_message(response['choices'][0]['message']['content'])
+            print(f"Messages to send: {messages_to_send}")
 
             # Generate TTS audio concurrently within the typing context
             audio_path = await generate_custom_tts(response['choices'][0]['message']['content'])
+            print(f"Audio path: {audio_path}")
 
         except Exception as e:
+            print(f"Error: {e}")
             await message.channel.send("Sorry, I couldn't process your request at the moment.")
+            return
 
     # Send text and play TTS simultaneously after the typing indicator stops
     async def send_text_and_play_tts():
+        print("Sending text and playing TTS")
         for msg in messages_to_send:
             await message.channel.send(msg)
         if audio_path and message.guild.voice_client:
@@ -318,8 +356,10 @@ async def on_message(bot, message):
             while voice_client.is_playing():
                 await asyncio.sleep(1)
             os.remove(audio_path)
+            print("Audio played and file removed")
         elif not message.guild.voice_client:
             await message.channel.send("I need to be in a voice channel to speak!")
+            print("Bot not in voice channel")
 
     # Run the text sending and TTS playback concurrently
     await asyncio.gather(send_text_and_play_tts())

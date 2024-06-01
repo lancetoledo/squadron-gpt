@@ -2,7 +2,7 @@ import json
 import os
 from docx import Document
 
-def load_json_files(file_pattern):
+def load_json_files(directory, file_pattern):
     data = {"friends": [], "lance_relationships": []}
     json_files = [
         "Lance_Relationships_Detailed.json",
@@ -11,8 +11,9 @@ def load_json_files(file_pattern):
         "squadron2.json"
     ]
     for file_name in json_files:
+        file_path = os.path.join(directory, file_name)
         try:
-            with open(file_name, "r") as file:
+            with open(file_path, "r") as file:
                 file_data = json.load(file)
                 if "friends" in file_data:
                     data["friends"].extend(file_data.get("friends", []))

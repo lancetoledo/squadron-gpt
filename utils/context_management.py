@@ -16,3 +16,10 @@ def summarize_conversation(history):
     else:
         summarized_history = " ".join([msg["content"] for msg in history])
     return summarized_history
+
+# Function to split long messages into chunks within the limit
+def split_message(message, max_length=2000):
+    if len(message) <= max_length:
+        return [message]
+    else:
+        return [message[i:i+max_length] for i in range(0, len(message), max_length)]

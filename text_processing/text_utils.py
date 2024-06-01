@@ -17,9 +17,3 @@ def clean_text_for_tts(text):
     text = text.replace('  ', ' ')
     return text
 
-# Function to split long messages into chunks within the limit
-def split_message(message, max_length=2000):
-    if len(message) <= max_length:
-        return [message]
-    else:
-        return [message[i:i+max_length] for i in range(0, len(message), max_length)]
