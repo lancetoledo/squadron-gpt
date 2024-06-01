@@ -1,6 +1,5 @@
 import discord
 from discord.ext import commands
-from utils.feedback_utils import detect_and_handle_feedback
 from events.message_events import on_message
 from commands.command_handlers import join, leave
 
@@ -20,11 +19,6 @@ class DiscordClient(commands.Bot):
     async def on_message(self, message):
         # Ignore messages sent by the bot itself
         if message.author == self.user:
-            return
-
-        # Detect and handle feedback messages
-        if detect_and_handle_feedback(message):
-            await message.channel.send("Thank you for your feedback! It has been noted for future review")
             return
 
         # Pass the message to the custom on_message function from message_events

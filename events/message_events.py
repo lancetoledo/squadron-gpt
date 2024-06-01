@@ -6,7 +6,7 @@ import asyncio
 from config import OPENAI_API_KEY, STATIC_FRIEND_DATA, DISCORD_TO_REAL_NAME
 from utils.feedback_utils import save_feedback
 from text_processing.text_utils import truncate_text
-from text_processing.relationship_detection import is_relationship_inquiry, is_friend_inquiry, is_feedback
+from text_processing.relationship_detection import is_relationship_inquiry, is_friend_inquiry, is_feedback, is_general_inquiry
 from utils.file_utils import load_json_files
 from utils.context_management import update_history_with_extracted_info, truncate_history, summarize_conversation, split_message
 from tts.elevenlabs_tts import generate_custom_tts
@@ -183,8 +183,22 @@ def handle_relationship_inquiry(user_input, friend_name, primary_person=None):
                 detected_names.append(clean_word)
 
     if len(detected_names) == 1:
-        primary_person = friend_name.lower()
-        target_names = detected_names
+        # Check for additional names in the user input
+        words = user_input.lower().split()
+        additional_names = []
+        for word in words:
+            clean_word = word.strip(".,!?").lower()
+            if clean_word.endswith("'s"):
+                clean_word = clean_word[:-2]  # Remove 's from the word
+            if clean_word in known_friend_names and clean_word != detected_names[0]:
+                additional_names.append(clean_word)
+        
+        if additional_names:
+            primary_person = detected_names[0]
+            target_names = additional_names
+        else:
+            primary_person = friend_name.lower()
+            target_names = detected_names
     else:
         primary_person = detected_names[0] if detected_names else friend_name.lower()
         target_names = detected_names[1:] if len(detected_names) > 1 else []
@@ -197,6 +211,7 @@ def handle_relationship_inquiry(user_input, friend_name, primary_person=None):
         return relationships_info
     else:
         return f"No information found for relationship between {primary_person} and the detected friends."
+
 
 # Guardrails for sensitive topics specific to Lance and Jenny
 def check_sensitive_topics(context, user_input):
@@ -287,10 +302,14 @@ async def on_message(bot, message):
                 else:
                     response_context = friend_data
                     print(f"Friend data for {friend_name}: {response_context}")
-            else:
+            elif is_general_inquiry(user_input):
+                print("Detected general inquiry in user input")
                 user_data = get_friend_data(friend_name)
                 response_context = user_data
                 print(f"General inquiry response for {friend_name}: {response_context}")
+            else:
+                response_context = f"Sorry, I don't understand the request."
+                print("User input did not match any inquiry type")
 
             # Apply guardrails for sensitive topics
             response_context = check_sensitive_topics(json.dumps(response_context, indent=2), user_input)
@@ -325,12 +344,12 @@ async def on_message(bot, message):
                 model="gpt-4o",
                 messages=conversation_history + [{"role": "system", "content": brendan_context}, {"role": "user", "content": user_input}]
             )
-            print(f"OpenAI response: {response}")
+            # print(f"OpenAI response: {response}")
 
             session_histories[session_id].append({"role": "assistant", "content": response['choices'][0]['message']['content']})
             # Ensure response is within the character limit for Discord
             messages_to_send = split_message(response['choices'][0]['message']['content'])
-            print(f"Messages to send: {messages_to_send}")
+            # print(f"Messages to send: {messages_to_send}")
 
             # Generate TTS audio concurrently within the typing context
             audio_path = await generate_custom_tts(response['choices'][0]['message']['content'])
@@ -340,7 +359,7 @@ async def on_message(bot, message):
             print(f"Error: {e}")
             await message.channel.send("Sorry, I couldn't process your request at the moment.")
             return
-
+        
     # Send text and play TTS simultaneously after the typing indicator stops
     async def send_text_and_play_tts():
         print("Sending text and playing TTS")

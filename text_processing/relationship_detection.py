@@ -38,3 +38,10 @@ def is_feedback(user_input):
     score = doc.cats["feedback"]
     print(f"Feedback score: {score}")
     return score > 0.5
+
+# Function to check if the user input is a general inquiry
+def is_general_inquiry(user_input):
+    doc = relationship_model(user_input)
+    score = doc.cats["general_inquiry"]
+    print(f"General inquiry score: {score}")
+    return score > 0.5
