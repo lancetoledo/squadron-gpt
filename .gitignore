@@ -1,3 +1,6 @@
 # .gitignore
 .env
 data/
+
+# Ignore training data directory
+training/
