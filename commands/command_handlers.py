@@ -23,3 +23,5 @@ async def leave(ctx):
     else:
         await ctx.send("I'm not in a voice channel!")
         print("Bot not in a voice channel")
+        print("Bot IS in a voice channel")
+
