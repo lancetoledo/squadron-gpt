@@ -11,6 +11,8 @@ from utils.file_utils import load_json_files
 from utils.context_management import update_history_with_extracted_info, truncate_history, summarize_conversation, split_message
 from tts.elevenlabs_tts import generate_custom_tts
 from text_processing.spacy_setup import nlp
+import yt_dlp as youtube_dl
+import io
 
 # Set the OpenAI API key
 openai.api_key = OPENAI_API_KEY
@@ -33,7 +35,7 @@ session_contexts = {}
 #     {"name": "Bob"}
 # ]
 
-# This is used so the bot can recognize discord users to their real names so the bot can search it's data set for them.
+# This is used so the bot can recognize discord users to their real names so the bot can search its data set for them.
 # DISCORD_TO_REAL_NAME = {
 #     "noobmaster69": "Korg",
 #     "thechosenone": "Neo",
@@ -214,7 +216,6 @@ def handle_relationship_inquiry(user_input, friend_name, primary_person=None):
     else:
         return f"No information found for relationship between {primary_person} and the detected friends."
 
-
 # Guardrails for sensitive topics specific to Lance and Jenny
 def check_sensitive_topics(context, user_input):
     sensitive_phrases = [
@@ -238,10 +239,10 @@ def check_sensitive_topics(context, user_input):
 
 # Event triggered when a message is received
 async def on_message(bot, message):
-    print(f"on_message triggered by: {message.author.name}, content: {message.content}")
+    # print(f"on_message triggered by: {message.author.name}, content: {message.content}")
 
     if message.author == bot.user or not message.content.startswith('!talk'):
-        print("Message is from bot or does not start with '!talk'")
+        # print("Message is from bot or does not start with '!talk'")
         await bot.process_commands(message)
         return
 
@@ -270,7 +271,26 @@ async def on_message(bot, message):
         messages_to_send = []
         audio_path = None
 
+        voice_client = message.guild.voice_client
+        music_was_playing = False
+        current_source = None
+
+        def on_finished_playing(error):
+            if error:
+                print(f"Error in playback: {error}")
+                # Retry logic or handle the error
+            else:
+                print("Playback finished.")
+                # Optionally, add code to handle end of playback
+
         try:
+            # Check if music is currently playing
+            if voice_client and voice_client.is_playing():
+                voice_client.pause()
+                current_source = voice_client.source
+                music_was_playing = True
+                await message.channel.send("Pausing music to respond...")
+
             if is_feedback(user_input):
                 print("Detected feedback in user input")
                 save_feedback(user_input, discord_name)
@@ -360,6 +380,8 @@ async def on_message(bot, message):
         except Exception as e:
             print(f"Error: {e}")
             await message.channel.send("Sorry, I couldn't process your request at the moment.")
+            if music_was_playing:
+                voice_client.resume()
             return
         
     # Send text and play TTS simultaneously after the typing indicator stops
@@ -369,7 +391,9 @@ async def on_message(bot, message):
             await message.channel.send(msg)
         if audio_path and message.guild.voice_client:
             voice_client = message.guild.voice_client
-            voice_client.play(discord.FFmpegPCMAudio(executable="C:/ffmpeg/bin/ffmpeg.exe", source=audio_path), after=lambda e: print('done', e))
+            tts_source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(executable="C:/ffmpeg/bin/ffmpeg.exe", source=audio_path))
+            tts_source.volume = 3.0  # Adjust the volume for TTS
+            voice_client.play(tts_source, after=on_finished_playing)
             while voice_client.is_playing():
                 await asyncio.sleep(1)
             os.remove(audio_path)
@@ -377,6 +401,12 @@ async def on_message(bot, message):
         elif not message.guild.voice_client:
             await message.channel.send("I need to be in a voice channel to speak!")
             print("Bot not in voice channel")
+
+        if music_was_playing and current_source:
+            await message.channel.send("Resuming music...")
+            music_source = discord.PCMVolumeTransformer(current_source)
+            music_source.volume = 0.5  # Adjust the volume for music
+            voice_client.play(music_source, after=on_finished_playing)
 
     # Run the text sending and TTS playback concurrently
     await asyncio.gather(send_text_and_play_tts())

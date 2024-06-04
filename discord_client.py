@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from events.message_events import on_message
-from commands.command_handlers import join, leave
+from commands.command_handlers import join, leave, play, pause, resume, stop
 
 # Class definition for the Discord client, inheriting from commands.Bot
 class DiscordClient(commands.Bot):
@@ -10,6 +10,10 @@ class DiscordClient(commands.Bot):
         # Add custom commands to the bot
         self.add_command(join)
         self.add_command(leave)
+        self.add_command(play)
+        self.add_command(pause)
+        self.add_command(resume)
+        self.add_command(stop)
 
     # Event handler for when the bot is ready and connected
     async def on_ready(self):
