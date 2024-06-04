@@ -18,6 +18,7 @@ class DiscordClient(commands.Bot):
     # Event handler for when the bot is ready and connected
     async def on_ready(self):
         print(f'Logged in as {self.user.name} ({self.user.id})')  # Print bot's username and ID
+        await self.change_presence(activity=discord.Game(name="The Game of Life 4"))
 
     # Event handler for when a message is received
     async def on_message(self, message):

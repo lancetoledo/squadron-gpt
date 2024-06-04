@@ -237,6 +237,7 @@ def check_sensitive_topics(context, user_input):
     
     return context
 
+
 # Event triggered when a message is received
 async def on_message(bot, message):
     # print(f"on_message triggered by: {message.author.name}, content: {message.content}")
@@ -271,9 +272,6 @@ async def on_message(bot, message):
         messages_to_send = []
         audio_path = None
 
-        voice_client = message.guild.voice_client
-        music_was_playing = False
-        current_source = None
 
         def on_finished_playing(error):
             if error:
@@ -284,13 +282,6 @@ async def on_message(bot, message):
                 # Optionally, add code to handle end of playback
 
         try:
-            # Check if music is currently playing
-            if voice_client and voice_client.is_playing():
-                voice_client.pause()
-                current_source = voice_client.source
-                music_was_playing = True
-                await message.channel.send("Pausing music to respond...")
-
             if is_feedback(user_input):
                 print("Detected feedback in user input")
                 save_feedback(user_input, discord_name)
@@ -380,13 +371,21 @@ async def on_message(bot, message):
         except Exception as e:
             print(f"Error: {e}")
             await message.channel.send("Sorry, I couldn't process your request at the moment.")
-            if music_was_playing:
-                voice_client.resume()
             return
         
     # Send text and play TTS simultaneously after the typing indicator stops
     async def send_text_and_play_tts():
+        voice_client = message.guild.voice_client
+        music_was_playing = False
+        current_source = None
+
         print("Sending text and playing TTS")
+        if voice_client and voice_client.is_playing():
+            voice_client.pause()
+            current_source = voice_client.source
+            music_was_playing = True
+            await message.channel.send("Pausing music to respond...")
+
         for msg in messages_to_send:
             await message.channel.send(msg)
         if audio_path and message.guild.voice_client:
