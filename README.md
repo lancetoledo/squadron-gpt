@@ -11,6 +11,8 @@ Squadron GPT is a sassy, sarcastic Discord bot designed to engage users with a p
 - **Feedback Handling**: Detects feedback messages and stores them for future review.
 - **Text-to-Speech (TTS)**: Uses ElevenLabs API to generate custom TTS responses.
 - **Voice Channel Integration**: Joins and leaves voice channels to play TTS responses.
+- **GPT-4 API Integration**: Uses OpenAI's GPT-4 API for generating responses.
+- **Music Streaming**: Streams music from YouTube, SoundCloud, and Bandcamp.
 
 ## Directory Structure
 
@@ -83,8 +85,8 @@ squadron-gpt/
     RELATIONSHIPS_DATA2=Navi_Relationships_Detailed.json
     FRIEND_DATA1=squadron1.json
     FRIEND_DATA2=squadron2.json
-    STATIC_FRIEND_DATA=[{"name": "Christian"}, {"name": "Julia"}, {"name": "Rizelyn"}]
-    DISCORD_TO_REAL_NAME={"l3d0": "Lance", "atomichi": "Juan", "fabsesports": "Fabio", "yenyverse": "Jenny", "ashleyyjennaa": "Ashley", "naviixg": "Navjot"}
+    STATIC_FRIEND_DATA=[{"name": "Christian"}, {"name": "Justine"}, {"name": "Bob"}]
+    DISCORD_TO_REAL_NAME={"noobmaster69": "Korg", "thechosenone": "Neo"}
     ```
 
 5. **Download NLTK data**:
@@ -108,6 +110,7 @@ squadron-gpt/
 
 - **Join Voice Channel**: `!join`
 - **Leave Voice Channel**: `!leave`
+- **Play Music**: `!play <url>`
 
 ### Handling Sensitive Data
 
@@ -116,7 +119,7 @@ To prevent sensitive data from being pushed to GitHub:
 1. **Use `.env` for sensitive variables**:
     - Store your API keys, tokens, and personal data filenames in the `.env` file.
 
-2. **Update `.gitignore`**:
+2. **Update `.gitignore**:
     - Ensure your `.gitignore` file includes entries for `.env` and `data/` directory:
     ```gitignore
     .env
@@ -129,7 +132,7 @@ For `static_friend_data` and `discord_to_real_name`, structure your data in `.en
 
 ```dotenv
 STATIC_FRIEND_DATA=[{"name": "Christian"}, {"name": "Justine"}, {"name": "Bob"}]
-DISCORD_TO_REAL_NAME={"noobmaster69": "Korg","thechosenone": "Neo",}
+DISCORD_TO_REAL_NAME={"noobmaster69": "Korg","thechosenone": "Neo"}
 ```
 
 ### Contributing
