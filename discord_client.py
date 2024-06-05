@@ -1,9 +1,9 @@
 import discord
 from discord.ext import commands
 from events.message_events import on_message
-from commands.command_handlers import join, leave, play, pause, resume, stop, queue, clear, skip, birthday, config, export_birthdays, override, daily_birthday_check
-import logging
-logging.basicConfig(level=logging.DEBUG)
+from commands.command_handlers import join, leave, play, pause, resume, stop, queue, clear, skip, birthday, config, export_birthdays, override, daily_birthday_check, talk
+
+
 
 # Class definition for the Discord client, inheriting from commands.Bot
 class DiscordClient(commands.Bot):
@@ -23,6 +23,7 @@ class DiscordClient(commands.Bot):
         self.add_command(config)
         self.add_command(export_birthdays)
         self.add_command(override)
+        self.add_command(talk)  # Add the talk command
 
     # Event handler for when the bot is ready and connected
     async def on_ready(self):
