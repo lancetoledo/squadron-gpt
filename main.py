@@ -9,6 +9,24 @@ setup_nltk()
 # Load spaCy models
 nlp, relationship_model = load_spacy_models()
 
+# Function to load cogs
+async def load_cogs(bot):
+    extensions = [
+        'commands.music_cog',
+        'commands.birthday_cog',
+        'commands.general_cog',
+    ]
+    for ext in extensions:
+        try:
+            await bot.load_extension(ext)
+            print(f'Loaded extension: {ext}')
+        except Exception as e:
+            print(f'Failed to load extension {ext}.')
+            print(e)
+
 # Run the Discord bot
 if __name__ == "__main__":
+    print("Starting bot")
+    import asyncio
+    asyncio.run(load_cogs(client))
     client.run(DISCORD_BOT_TOKEN)
