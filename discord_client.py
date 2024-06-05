@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from events.message_events import on_message
-from commands.command_handlers import join, leave, play, pause, resume, stop, queue, clear
+from commands.command_handlers import join, leave, play, pause, resume, stop, queue, clear, skip, birthday, config, export_birthdays, override, daily_birthday_check
 import logging
 logging.basicConfig(level=logging.DEBUG)
 
@@ -18,20 +18,18 @@ class DiscordClient(commands.Bot):
         self.add_command(stop)
         self.add_command(queue)
         self.add_command(clear)
+        self.add_command(skip)
+        self.add_command(birthday)
+        self.add_command(config)
+        self.add_command(export_birthdays)
+        self.add_command(override)
 
     # Event handler for when the bot is ready and connected
     async def on_ready(self):
         print(f'Logged in as {self.user.name} ({self.user.id})')  # Print bot's username and ID
-        # await self.change_presence(activity=discord.Game(name="The Game of Life 4"))
         await self.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="Lance's memories 🔬"))
-        # await self.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="Alex's search history 👀"))
-        # await self.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="To Be Loved by Alex Su"))
-        # await self.change_presence(activity=discord.Game(name="Escape Room: Discord Edition"))
-        # await self.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="The Office w/Navi 🖇️"))
-        # await self.change_presence(activity=discord.Game(name="guess Juan's next move 🎲"))
-        # await self.change_presence(activity=discord.Activity(type=discord.ActivityType.competing, name="against Fabio's intellect 🤓"))
-        # await self.change_presence(activity=discord.Game(name="mind games with Fabio 🧠"))
-        
+        # Start the daily birthday check task
+        self.loop.create_task(daily_birthday_check(self))
 
     # Event handler for when a message is received
     async def on_message(self, message):
