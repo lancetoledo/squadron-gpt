@@ -1,12 +1,15 @@
 import discord
 from discord.ext import commands
 from utils.music_utils import get_audio_url
+from utils.file_utils import load_json_files
 import asyncio
 import sqlite3
 import os
-from datetime import datetime, timedelta
+from dateutil.parser import parse
+from datetime import datetime
 import logging
 import random
+import json
 
 
 # Setup logging
@@ -29,6 +32,9 @@ is_playing = False
 db_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'birthdays.db')
 os.makedirs(os.path.dirname(db_path), exist_ok=True)
 
+# Load DISCORD_TO_REAL_NAME mapping from environment variable
+DISCORD_TO_REAL_NAME = json.loads(os.getenv('DISCORD_TO_REAL_NAME', '{}'))
+
 # Database setup
 conn = sqlite3.connect(db_path)
 cursor = conn.cursor()
@@ -38,7 +44,8 @@ cursor.execute('''
     CREATE TABLE IF NOT EXISTS birthdays (
         user_id TEXT PRIMARY KEY,
         birthday TEXT,
-        timezone TEXT
+        timezone TEXT,
+        message TEXT DEFAULT NULL
     )
 ''')
 conn.commit()
@@ -47,12 +54,18 @@ conn.commit()
 
 # Helper function to parse dates
 def parse_date(date_str):
+    # Try known formats first
     for fmt in ('%Y-%m-%d', '%m/%d/%Y'):
         try:
             return datetime.strptime(date_str, fmt).strftime('%Y-%m-%d')
         except ValueError:
             pass
-    raise ValueError('Invalid date format. Use YYYY-MM-DD or MM/DD/YYYY.')
+    
+    # Fallback to dateutil.parser for more flexible parsing
+    try:
+        return parse(date_str).strftime('%Y-%m-%d')
+    except ValueError:
+        raise ValueError(f"Invalid date format: {date_str}. Please use a recognizable date format.")
 
 # Helper Function to play the next song in the queue
 async def play_next(ctx):
@@ -222,8 +235,6 @@ async def skip(ctx):
 
 ### Birthday Bot Commands ###
 
-### Birthday Bot Commands ###
-
 # !birthday commands group
 @commands.group(name='birthday', help='Commands related to managing birthdays')
 async def birthday(ctx):
@@ -231,6 +242,62 @@ async def birthday(ctx):
         await ctx.send('Invalid birthday command. Use !birthday get, !birthday set, !birthday show-nearest, or !birthday remove.')
         logger.debug('Invalid birthday command used.')
         print('Invalid birthday command used.')
+
+# Subcommand to import birthdays from friends data
+# Example: !birthday import
+@birthday.command(name='import', help='Import birthdays from friends data')
+async def import_birthdays(ctx):
+    logger.debug('Starting import of birthdays from friends data')
+    print('Starting import of birthdays from friends data')
+    
+    # Load friends data from JSON files
+    directory = os.path.join(os.path.dirname(__file__), '..', 'data')
+    data = load_json_files(directory)
+    friends = data.get("friends", [])
+    
+    # Reverse the DISCORD_TO_REAL_NAME dictionary
+    real_name_to_discord = {v: k for k, v in DISCORD_TO_REAL_NAME.items()}
+    
+    for friend in friends:
+        name = friend.get('name')
+        if not name:
+            continue
+        
+        basic_info = friend.get('basicInfo', {})
+        birthday = basic_info.get('birthday')
+        
+        if not birthday:
+            continue
+        
+        # Find the corresponding Discord name
+        discord_name = real_name_to_discord.get(name)
+        if not discord_name:
+            continue
+        
+        # Fetch the Discord user object
+        user = discord.utils.get(ctx.guild.members, name=discord_name)
+        if not user:
+            logger.error(f'User {discord_name} not found in the guild')
+            print(f'User {discord_name} not found in the guild')
+            continue
+        
+        # Parse the birthday to YYYY-MM-DD format
+        try:
+            parsed_date = parse_date(birthday)
+        except ValueError as e:
+            logger.error(f'Error parsing birthday for {name}: {e}')
+            print(f'Error parsing birthday for {name}: {e}')
+            continue
+        
+        # Insert or update the birthday in the database, assuming timezone is "EST"
+        cursor.execute('REPLACE INTO birthdays (user_id, birthday, timezone) VALUES (?, ?, ?)', (user.id, parsed_date, 'EST'))
+        conn.commit()
+        logger.debug(f'Imported birthday for {name} ({user.id}): {parsed_date}')
+        print(f'Imported birthday for {name} ({user.id}): {parsed_date}')
+    
+    await ctx.send('Birthdays have been imported successfully.')
+    logger.debug('Finished importing birthdays')
+    print('Finished importing birthdays')
 
 # Command to get a user's birthday
 # Example: !birthday get @Username

@@ -46,6 +46,7 @@ intents.messages = True  # Enable message events
 intents.message_content = True  # Enable access to message content
 intents.guilds = True  # Enable guild events
 intents.voice_states = True  # Enable voice state events
+intents.members = True  # Enable member events
 
 # Create an instance of the DiscordClient with the specified command prefix and intents
 client = DiscordClient(command_prefix='!', intents=intents)
