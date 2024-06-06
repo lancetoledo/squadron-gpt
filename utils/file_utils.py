@@ -53,3 +53,4 @@ def parse_docx(file_path):
             data[current_key] += f" {text}"
     # Return the parsed data
     return data
+

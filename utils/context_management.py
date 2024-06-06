@@ -1,3 +1,9 @@
+from datetime import datetime
+from dateutil.parser import parse
+import logging
+
+logger = logging.getLogger(__name__)
+
 def update_history_with_extracted_info(history, user_message, brendan_response):
     # Add the user's message and Brendan's response to the conversation history
     print("Updating history with user message and Brendan's response")
@@ -47,5 +53,6 @@ def parse_date(date_str):
     # Fallback to dateutil.parser for more flexible parsing
     try:
         return parse(date_str).strftime('%Y-%m-%d')
-    except ValueError:
+    except ValueError as e:
+        logger.error(f"Failed to parse date '{date_str}': {e}")
         raise ValueError(f"Invalid date format: {date_str}. Please use a recognizable date format.")

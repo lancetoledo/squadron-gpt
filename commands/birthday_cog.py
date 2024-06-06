@@ -3,7 +3,7 @@ from discord.ext import commands, tasks
 from datetime import datetime
 from utils.file_utils import load_json_files
 from utils.context_management import parse_date
-from dateutil.parser import parse
+
 import sqlite3
 import os
 import random
@@ -74,7 +74,6 @@ class BirthdayCog(commands.Cog):
         today = datetime.today()
         birth_date = datetime.strptime(birthday, "%Y-%m-%d")
         age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
-        print(f"LANCE IS {age} YEARS OLD")
         return age
 
     async def generate_personalized_message(self, user):
@@ -141,14 +140,13 @@ class BirthdayCog(commands.Cog):
         
         print(f"Sent birthday message to {user.name} in channel {channel_id}")
 
-
     @commands.group(name='birthday', help='Commands related to managing birthdays', invoke_without_command=True)
     async def birthday(self, ctx):
         if ctx.invoked_subcommand is None:
-            await ctx.send('Invalid birthday command. Use !birthday get, !birthday set, !birthday show-nearest, !birthday remove, or !birthday test-message.')
+            await ctx.send('Invalid birthday command. Use !birthday get, !birthday set, !birthday show-nearest, !birthday remove, !birthday list-birthdays, !birthday import-birthdays, or !birthday test-message.')
             logger.debug('Invalid birthday command used.')
 
-    @birthday.command(name='import', help='Import birthdays from friends data')
+    @birthday.command(name='import-birthdays', help='Import birthdays from friends data')
     async def import_birthdays(self, ctx):
         logger.debug('Starting import of birthdays from friends data')
 
@@ -161,16 +159,19 @@ class BirthdayCog(commands.Cog):
         for friend in friends:
             name = friend.get('name')
             if not name:
+                logger.debug('Skipping friend with no name')
                 continue
 
             basic_info = friend.get('basicInfo', {})
             birthday = basic_info.get('birthday')
 
             if not birthday:
+                logger.debug(f'Skipping {name} with no birthday')
                 continue
 
             discord_name = real_name_to_discord.get(name)
             if not discord_name:
+                logger.debug(f'Skipping {name} with no matching Discord name')
                 continue
 
             user = discord.utils.get(ctx.guild.members, name=discord_name)
@@ -180,6 +181,7 @@ class BirthdayCog(commands.Cog):
 
             try:
                 parsed_date = parse_date(birthday)
+                logger.debug(f'Parsed birthday for {name}: {parsed_date}')
             except ValueError as e:
                 logger.error(f'Error parsing birthday for {name}: {e}')
                 continue
@@ -190,6 +192,7 @@ class BirthdayCog(commands.Cog):
 
         await ctx.send('Birthdays have been imported successfully.')
         logger.debug('Finished importing birthdays')
+
 
     @birthday.command(name='get', help="Get a user's birthday")
     async def get_birthday(self, ctx, user: discord.User):
@@ -287,8 +290,24 @@ class BirthdayCog(commands.Cog):
         await ctx.send("Your birthday information has been removed.")
         logger.debug(f'Birthday information removed for user {user_id}')
     
-    # Command to test the birthday message
-    # Example: !birthday test-message
+    @birthday.command(name='list-birthdays', help='List all birthdays')
+    async def list_birthdays(self, ctx):
+        logger.debug('Listing all birthdays')
+        self.cursor.execute('SELECT user_id, birthday FROM birthdays')
+        all_birthdays = self.cursor.fetchall()
+        
+        if all_birthdays:
+            birthday_list = []
+            for user_id, birthday in all_birthdays:
+                user = await ctx.bot.fetch_user(user_id)
+                birthday_list.append(f"{user.name}: {birthday}")
+            
+            await ctx.send("Birthdays:\n" + "\n".join(birthday_list))
+            logger.debug(f'Listed all birthdays: {birthday_list}')
+        else:
+            await ctx.send("No birthdays found.")
+            logger.debug('No birthdays found')
+
     @birthday.command(name='test-message', help='Test the birthday message for user "yenyverse"')
     async def test_message(self, ctx):
         YOUR_ANNOUNCEMENT_CHANNEL_ID = 692429647245213737  # Replace with your actual channel ID
