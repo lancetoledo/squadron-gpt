@@ -33,3 +33,19 @@ def split_message(message, max_length=2000):
         return [message]
     else:
         return [message[i:i+max_length] for i in range(0, len(message), max_length)]
+
+
+# Helper function to parse dates
+def parse_date(date_str):
+    # Try known formats first
+    for fmt in ('%Y-%m-%d', '%m/%d/%Y'):
+        try:
+            return datetime.strptime(date_str, fmt).strftime('%Y-%m-%d')
+        except ValueError:
+            pass
+    
+    # Fallback to dateutil.parser for more flexible parsing
+    try:
+        return parse(date_str).strftime('%Y-%m-%d')
+    except ValueError:
+        raise ValueError(f"Invalid date format: {date_str}. Please use a recognizable date format.")

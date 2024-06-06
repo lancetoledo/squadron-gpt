@@ -2,12 +2,17 @@ import discord
 from discord.ext import commands, tasks
 from datetime import datetime
 from utils.file_utils import load_json_files
+from utils.context_management import parse_date
 from dateutil.parser import parse
 import sqlite3
 import os
-import asyncio
 import random
 import logging
+import openai
+import json
+from config import DISCORD_TO_REAL_NAME
+from utils.summarization import truncate_text
+from utils.friend_utils import get_friend_data
 
 db_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'birthdays.db')
 conn = sqlite3.connect(db_path)
@@ -49,25 +54,98 @@ class BirthdayCog(commands.Cog):
         today = datetime.now().date()
         self.cursor.execute('SELECT user_id, message FROM birthdays WHERE strftime("%m-%d", birthday) = ?', (today.strftime("%m-%d"),))
         users_with_birthday = self.cursor.fetchall()
+        
+        # Debug print statement
+        print(f"Users with birthdays today: {users_with_birthday}")
+        
         for user_id, message in users_with_birthday:
+            # Debug print statement
+            print(f"Processing user: {user_id}, with message: {message}")
+            
             user = await self.bot.fetch_user(user_id)
-            if message:
-                birthday_message = message.replace("{user}", user.mention)
-            else:
-                birthday_message = f"Happy Birthday, {user.mention}!"
-
+            personalized_message = await self.generate_personalized_message(user)
             gif_url = random.choice(self.birthday_gifs)
-            await self.bot.get_channel(YOUR_ANNOUNCEMENT_CHANNEL_ID).send(birthday_message)
-            embed = discord.Embed()
-            embed.set_image(url=gif_url)
-            await self.bot.get_channel(YOUR_ANNOUNCEMENT_CHANNEL_ID).send(embed=embed)
+            await self.send_birthday_message(user, personalized_message, gif_url, YOUR_ANNOUNCEMENT_CHANNEL_ID)
+            
         logger.debug('Birthday announcements sent')
         print('Birthday announcements sent')
 
-    @commands.group(name='birthday', help='Commands related to managing birthdays')
+    def calculate_age(self, birthday):
+        today = datetime.today()
+        birth_date = datetime.strptime(birthday, "%Y-%m-%d")
+        age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
+        print(f"LANCE IS {age} YEARS OLD")
+        return age
+
+    async def generate_personalized_message(self, user):
+        # Retrieve friend data
+        discord_name = user.name
+        friend_name = DISCORD_TO_REAL_NAME.get(discord_name, discord_name)  # Use Discord username if real name is not found
+        friend_data = get_friend_data(friend_name)
+        
+        # Retrieve birthday from the database
+        self.cursor.execute('SELECT birthday FROM birthdays WHERE user_id = ?', (user.id,))
+        result = self.cursor.fetchone()
+        if result:
+            birthday = result[0]
+            age = self.calculate_age(birthday)
+        else:
+            # Handle case where birthday is not found
+            age = "unknown"
+
+        # Create context for Brendan
+        brendan_context = f"""
+        Brendan is designed as a sassy, sarcastic chatbot, engaging users with a playful, sharp-witted manner that adapts to the personalities and interests of the user's friends.
+        Brendan tailors each conversation to the friend's likes, personalities, and goals.
+        This session is with {friend_name} and they are {age} years old now.
+        Context: {truncate_text(json.dumps(friend_data, indent=2))}
+        """
+
+        if friend_name == "Fabio":
+            brendan_context = f"""
+            Brendan is extremely sarcastic, sassy but still performs its usual functionality he's just reluctant to help Fabio. Using its sharp-witted manner that adapts to the personalities and interests of the user's friends.
+            Brendan tailors each conversation to the friend's likes, personalities, and goals.
+            This session is with {friend_name} and they are {age} years old now.
+            Context: {truncate_text(json.dumps(friend_data, indent=2))}
+            """
+
+        # Send request to Chat GPT-4o to generate message
+        response = openai.ChatCompletion.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": brendan_context},
+                {"role": "user", "content": f"Write a sincere and personalized birthday message for {friend_name} who is turning {age} and that message would make their day."}
+            ]
+        )
+        personalized_message = response['choices'][0]['message']['content']
+        return personalized_message
+
+    async def send_birthday_message(self, user, personalized_message, gif_url, channel_id):
+        channel = self.bot.get_channel(channel_id)
+        if not channel:
+            print(f"Channel with ID {channel_id} not found.")
+            return
+
+        # Include the @mention in the personalized message
+        message_with_mention = f"{user.mention} {personalized_message}"
+        
+        # Send the birthday message
+        await channel.send(message_with_mention)
+        
+        # Create an embed for the GIF
+        embed = discord.Embed()
+        embed.set_image(url=gif_url)
+        
+        # Send the GIF embed
+        await channel.send(embed=embed)
+        
+        print(f"Sent birthday message to {user.name} in channel {channel_id}")
+
+
+    @commands.group(name='birthday', help='Commands related to managing birthdays', invoke_without_command=True)
     async def birthday(self, ctx):
         if ctx.invoked_subcommand is None:
-            await ctx.send('Invalid birthday command. Use !birthday get, !birthday set, !birthday show-nearest, or !birthday remove.')
+            await ctx.send('Invalid birthday command. Use !birthday get, !birthday set, !birthday show-nearest, !birthday remove, or !birthday test-message.')
             logger.debug('Invalid birthday command used.')
 
     @birthday.command(name='import', help='Import birthdays from friends data')
@@ -208,6 +286,30 @@ class BirthdayCog(commands.Cog):
         self.conn.commit()
         await ctx.send("Your birthday information has been removed.")
         logger.debug(f'Birthday information removed for user {user_id}')
+    
+    # Command to test the birthday message
+    # Example: !birthday test-message
+    @birthday.command(name='test-message', help='Test the birthday message for user "yenyverse"')
+    async def test_message(self, ctx):
+        YOUR_ANNOUNCEMENT_CHANNEL_ID = 692429647245213737  # Replace with your actual channel ID
+        test_user_id = "487600607016910849"  # Replace with the actual user ID of the tester
+        try:
+            user = await ctx.bot.fetch_user(test_user_id)
+            
+            # Generate personalized birthday message
+            personalized_message = await self.generate_personalized_message(user)
+            
+            # Select a random birthday GIF
+            gif_url = random.choice(self.birthday_gifs)
+            
+            # Send the birthday message and GIF embed
+            await self.send_birthday_message(user, personalized_message, gif_url, YOUR_ANNOUNCEMENT_CHANNEL_ID)
+            
+            logger.debug(f'Test birthday message sent to {user.name}')
+            print(f'Test birthday message sent to {user.name}')
+        except discord.errors.HTTPException as e:
+            logger.error(f'Failed to send test birthday message: {e}')
+            print(f'Failed to send test birthday message: {e}')
 
 async def setup(bot):
     await bot.add_cog(BirthdayCog(bot))

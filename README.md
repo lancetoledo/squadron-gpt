@@ -13,13 +13,16 @@ Squadron GPT is a sassy, sarcastic Discord bot designed to engage users with a p
 - **Voice Channel Integration**: Joins and leaves voice channels to play TTS responses.
 - **GPT-4 API Integration**: Uses OpenAI's GPT-4 API for generating responses.
 - **Music Streaming**: Streams music from YouTube, SoundCloud, and Bandcamp.
+- **Birthday Management**: Manage and announce user birthdays.
 
 ## Directory Structure
 
 ```plaintext
 squadron-gpt/
 ├── commands/
-│   └── command_handlers.py
+│   ├── music_cog.py
+│   ├── birthday_cog.py
+│   └── general_cog.py
 ├── data/
 │   └── (JSON files containing personal data)
 ├── events/
@@ -111,6 +114,29 @@ squadron-gpt/
 - **Join Voice Channel**: `!join`
 - **Leave Voice Channel**: `!leave`
 - **Play Music**: `!play <url>`
+- **Pause Music**: `!pause`
+- **Resume Music**: `!resume`
+- **Stop Music**: `!stop`
+- **Show Music Queue**: `!queue`
+- **Clear Music Queue**: `!clear`
+- **Skip Current Song**: `!skip`
+- **Talk with the Bot**: `!talk <message>`
+
+### Birthday Management Commands
+
+- **Set Birthday**: `!birthday set <date> <timezone>` - Set or update your birthday.
+- **Get Birthday**: `!birthday get <@username>` - Get a user's birthday.
+- **Remove Birthday**: `!birthday remove` - Remove your birthday information.
+- **Show Nearest Birthdays**: `!birthday show-nearest` - Get a list of users with upcoming birthdays.
+- **Set Birthday Message**: `!birthday set-message <message>` - Set a custom birthday message.
+- **Import Birthdays**: `!birthday import` - Import birthdays from friends data.
+
+### General Inquiry Commands
+
+- **Configure Bot**: `!config` - Configure settings for the bot.
+- **Check Configuration**: `!config check` - Test the bot's current configuration and show the results.
+- **Announcement Settings**: `!config announce` - Settings for birthday announcements.
+- **Set Birthday Role**: `!config birthday-role <@role>` - Set the role given to users having a birthday.
 
 ### Handling Sensitive Data
 
