@@ -1,7 +1,7 @@
 import json
 import os
 from docx import Document
-from config import RELATIONSHIPS_DATA1, RELATIONSHIPS_DATA2, FRIEND_DATA1, FRIEND_DATA2
+from config import RELATIONSHIPS_DATA1, RELATIONSHIPS_DATA2, FRIEND_DATA1, FRIEND_DATA2, FRIEND_DATA3
 
 def load_json_files(directory):
     # Initialize data structure to hold friends and relationships data
@@ -11,7 +11,8 @@ def load_json_files(directory):
         RELATIONSHIPS_DATA1,
         RELATIONSHIPS_DATA2,
         FRIEND_DATA1,
-        FRIEND_DATA2
+        FRIEND_DATA2,
+        FRIEND_DATA3
     ]
     # Iterate through each JSON file
     for file_name in json_files:

@@ -7,7 +7,7 @@ import json
 import asyncio
 import os
 
-from config import OPENAI_API_KEY, STATIC_FRIEND_DATA, DISCORD_TO_REAL_NAME
+from config import STATIC_FRIEND_DATA, DISCORD_TO_REAL_NAME
 from utils.context_management import update_history_with_extracted_info, truncate_history, summarize_conversation, split_message
 from utils.friend_utils import replace_nicknames, handle_relationship_inquiry, handle_friend_inquiry, get_friend_data, check_sensitive_topics
 from utils.feedback_utils import save_feedback

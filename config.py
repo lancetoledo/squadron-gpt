@@ -34,6 +34,7 @@ RELATIONSHIPS_DATA1 = os.getenv('RELATIONSHIPS_DATA1')
 RELATIONSHIPS_DATA2 = os.getenv('RELATIONSHIPS_DATA2')
 FRIEND_DATA1 = os.getenv('FRIEND_DATA1')
 FRIEND_DATA2 = os.getenv('FRIEND_DATA2')
+FRIEND_DATA3 = os.getenv('FRIEND_DATA3')
 
 # Static friend data and discord to real name mapping
 STATIC_FRIEND_DATA = json.loads(os.getenv('STATIC_FRIEND_DATA'))
