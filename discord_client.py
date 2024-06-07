@@ -9,8 +9,10 @@ class DiscordClient(commands.Bot):
     async def on_ready(self):
         print(f'Logged in as {self.user.name} ({self.user.id})')
         # await self.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="Lance's memories 🔬"))
-        await self.change_presence(activity=discord.Game(name="mind games with Fabio 🧠"))
+        # await self.change_presence(activity=discord.Game(name="mind games with Fabio 🧠"))
         # await self.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="Alex's songs 🎶"))
+        await self.change_presence(activity=discord.Game(name="Birthday games with Fabio 🎉"))
+
 
 
 

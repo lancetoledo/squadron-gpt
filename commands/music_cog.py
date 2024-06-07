@@ -12,6 +12,8 @@ ffmpeg_path = "C:/ffmpeg/bin/ffmpeg.exe"  # Update this path if necessary
 
 song_queue = []
 is_playing = False
+loop_song = False
+loop_queue = False
 
 class MusicCog(commands.Cog):
     def __init__(self, bot):
@@ -49,24 +51,32 @@ class MusicCog(commands.Cog):
             await ctx.send("Could not retrieve audio from the provided search term.")
             return
 
-        if is_playing:
-            song_queue.append((audio_url, title_or_source))
-            await ctx.send(f'Song added to the queue: {title_or_source}')
-        else:
-            song_queue.append((audio_url, title_or_source))
+        song_queue.append((audio_url, title_or_source))
+        if not is_playing:
             await self.play_next(ctx)
 
     async def play_next(self, ctx):
         global is_playing
         if song_queue:
-            next_song = song_queue.pop(0)
+            next_song = song_queue[0]
             audio_url, title = next_song
             voice_client = ctx.guild.voice_client
-            voice_client.play(discord.FFmpegPCMAudio(audio_url, executable=ffmpeg_path, **ffmpeg_opts), after=lambda e: asyncio.run_coroutine_threadsafe(self.play_next(ctx), ctx.bot.loop))
+            voice_client.play(discord.FFmpegPCMAudio(audio_url, executable=ffmpeg_path, **ffmpeg_opts), after=lambda e: asyncio.run_coroutine_threadsafe(self.play_next_song(ctx), ctx.bot.loop))
             is_playing = True
             await ctx.send(f'Now playing: {title}')
         else:
             is_playing = False
+
+    async def play_next_song(self, ctx):
+        global loop_song, loop_queue
+        if loop_song:
+            await self.play_next(ctx)
+        elif loop_queue:
+            song_queue.append(song_queue.pop(0))  # Move the song to the end of the queue
+            await self.play_next(ctx)
+        else:
+            song_queue.pop(0)
+            await self.play_next(ctx)
 
     @commands.command(name='pause', help='Pause the currently playing song', aliases=['ps'])
     async def pause(self, ctx):
@@ -125,6 +135,20 @@ class MusicCog(commands.Cog):
             await self.play_next(ctx)
         else:
             await ctx.send("No more songs in the queue.")
+
+    @commands.command(name='loop', help='Loop the current song or the entire queue', aliases=['lp'])
+    async def loop(self, ctx, mode: str = None):
+        global loop_song, loop_queue
+        if mode == 'song':
+            loop_song = not loop_song
+            loop_queue = False
+            await ctx.send(f'Looping current song: {"enabled" if loop_song else "disabled"}')
+        elif mode == 'queue':
+            loop_queue = not loop_queue
+            loop_song = False
+            await ctx.send(f'Looping entire queue: {"enabled" if loop_queue else "disabled"}')
+        else:
+            await ctx.send("Invalid mode. Use '!loop song' to loop the current song or '!loop queue' to loop the entire queue.")
 
 async def setup(bot):
     await bot.add_cog(MusicCog(bot))

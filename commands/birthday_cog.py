@@ -51,24 +51,50 @@ class BirthdayCog(commands.Cog):
     async def daily_birthday_check(self):
         await self.bot.wait_until_ready()
         YOUR_ANNOUNCEMENT_CHANNEL_ID = 692429647245213737  # Replace with your actual channel ID
+        GUILD_ID = 123456789012345678  # Replace with your actual guild ID
+        BIRTHDAY_ROLE_NAME = "🎉 BIRTHDAY BITCH 🎂"  # The exact name of the birthday role
+
         today = datetime.now().date()
         self.cursor.execute('SELECT user_id, message FROM birthdays WHERE strftime("%m-%d", birthday) = ?', (today.strftime("%m-%d"),))
         users_with_birthday = self.cursor.fetchall()
-        
+
+        guild = self.bot.get_guild(GUILD_ID)
+        if not guild:
+            print("Guild not found")
+            return
+
+        birthday_role = discord.utils.get(guild.roles, name=BIRTHDAY_ROLE_NAME)
+        if not birthday_role:
+            print(f"Role '{BIRTHDAY_ROLE_NAME}' not found")
+            return
+
         # Debug print statement
         print(f"Users with birthdays today: {users_with_birthday}")
-        
+
         for user_id, message in users_with_birthday:
             # Debug print statement
             print(f"Processing user: {user_id}, with message: {message}")
-            
-            user = await self.bot.fetch_user(user_id)
-            personalized_message = await self.generate_personalized_message(user)
+
+            member = guild.get_member(user_id)
+            if not member:
+                print(f"Member with ID {user_id} not found in the guild")
+                continue
+
+            if birthday_role in member.roles:
+                print(f"User {member.name} already has the birthday role, skipping...")
+                continue
+
+            personalized_message = await self.generate_personalized_message(member)
             gif_url = random.choice(self.birthday_gifs)
-            await self.send_birthday_message(user, personalized_message, gif_url, YOUR_ANNOUNCEMENT_CHANNEL_ID)
-            
+            await self.send_birthday_message(member, personalized_message, gif_url, YOUR_ANNOUNCEMENT_CHANNEL_ID)
+
+            # Assign the birthday role to the user
+            await member.add_roles(birthday_role)
+            print(f"Assigned birthday role to user {member.name}")
+
         logger.debug('Birthday announcements sent')
         print('Birthday announcements sent')
+
 
     def calculate_age(self, birthday):
         today = datetime.today()
