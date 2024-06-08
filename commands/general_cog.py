@@ -75,9 +75,9 @@ class GeneralCog(commands.Cog):
 
             print(f"Discord name: {discord_name}, Channel ID: {channel_id}, Session ID: {session_id}")
 
-            friend_name = DISCORD_TO_REAL_NAME.get(discord_name, discord_name)  # Use Discord username if real name is not found
-            primary_person = friend_name.lower()
-            print(f"Friend name: {friend_name}, Primary person: {primary_person}")
+            user_name = DISCORD_TO_REAL_NAME.get(discord_name, discord_name)  # Use Discord username if real name is not found
+            primary_person = user_name.lower()
+            print(f"User name: {user_name}, Primary person: {primary_person}")
 
             user_input = replace_nicknames(user_input)
             print(f"User input after replacing nicknames: {user_input}")
@@ -89,6 +89,7 @@ class GeneralCog(commands.Cog):
 
             messages_to_send = []
             audio_path = None
+            queried_friend_name = None
 
             def on_finished_playing(error):
                 if error:
@@ -107,7 +108,7 @@ class GeneralCog(commands.Cog):
 
                 if is_relationship_inquiry(user_input):
                     print("Detected relationship inquiry in user input")
-                    relationship_info = handle_relationship_inquiry(user_input, friend_name, primary_person, self.known_friend_names)
+                    relationship_info = handle_relationship_inquiry(user_input, user_name, primary_person, self.known_friend_names)
 
                     if relationship_info is None:
                         response_context = f"Sorry, I don't understand the request."
@@ -121,67 +122,57 @@ class GeneralCog(commands.Cog):
                         print(f"Relationship JSON retrieved: {response_context}")
                     else:
                         response_context = relationship_info
-                        # print(f"Relationship inquiry response: {response_context}")
                 elif is_friend_inquiry(user_input, self.known_friend_names):
                     print("Detected friend inquiry in user input")
-                    friend_data = handle_friend_inquiry(user_input, friend_name, self.known_friend_names, self.nickname_to_full_name)
+                    friend_data, queried_friend_name = handle_friend_inquiry(user_input, user_name, self.known_friend_names, self.nickname_to_full_name)
 
                     if friend_data is None:
                         response_context = f"Sorry, I don't understand the request."
                         print("Friend inquiry resulted in no information")
                     else:
                         response_context = friend_data
-                        print(f"Friend data for {friend_name}: {response_context}")
+                        print(f"Friend data: {response_context}")
                 elif is_general_inquiry(user_input):
                     print("Detected general inquiry in user input")
-                    user_data = get_friend_data(friend_name)
+                    user_data = get_friend_data(user_name)
                     response_context = user_data
-                    # print(f"General inquiry response for {friend_name}: {response_context}")
                 else:
                     response_context = f"Sorry, I don't understand the request."
                     print("User input did not match any inquiry type")
 
-                # Apply guardrails for sensitive topics
                 response_context = check_sensitive_topics(json.dumps(response_context, indent=2), user_input)
-                # print(f"Response context after applying sensitive topic guardrails: {response_context}")
 
-                # Summarize conversation history to maintain context
                 self.session_histories[session_id] = update_history_with_extracted_info(self.session_histories[session_id], user_input, response_context)
                 conversation_history = self.session_histories[session_id]
                 conversation_history.append({"role": "system", "content": summarize_conversation(self.session_histories[session_id])})
                 conversation_history = truncate_history(conversation_history)
-                # print(f"Conversation history: {conversation_history}")
 
-                # Custom GPT simulation context for Brendan with expanded detail
+                if queried_friend_name is None:
+                    queried_friend_name = primary_person
+
                 brendan_context = f"""
                 Brendan is designed as a sassy, sarcastic chatbot, engaging users with a playful, sharp-witted manner that adapts to the personalities and interests of the user's friends.
                 Brendan tailors each conversation to the friend's likes, personalities, and goals.
-                This session is with {friend_name}.
+                This session is with {queried_friend_name}.
                 Context: {truncate_text(json.dumps(response_context, indent=2))}
                 """
 
-                if friend_name == "Fabio":
+                if queried_friend_name == "Fabio":
                     brendan_context = f"""
                     Brendan is not friendly, more reluctant, more sarcastic, sassy but still performs its usual functionality when talking to Fabio. Using its sharp-witted manner that adapts to the personalities and interests of the user's friends.
                     Brendan tailors each conversation to the friend's likes, personalities, and goals.
-                    This session is with {friend_name}.
+                    This session is with {queried_friend_name}.
                     Context: {truncate_text(json.dumps(response_context, indent=2))}
                     """
-
-                # print(f"Brendan context: {brendan_context}")
 
                 response = openai.ChatCompletion.create(
                     model="gpt-4o",
                     messages=conversation_history + [{"role": "system", "content": brendan_context}, {"role": "user", "content": user_input}]
                 )
-                # print(f"OpenAI response: {response}")
 
                 self.session_histories[session_id].append({"role": "assistant", "content": response['choices'][0]['message']['content']})
-                # Ensure response is within the character limit for Discord
                 messages_to_send = split_message(response['choices'][0]['message']['content'])
-                # print(f"Messages to send: {messages_to_send}")
 
-                # Generate TTS audio concurrently within the typing context
                 audio_path = await generate_custom_tts(response['choices'][0]['message']['content'])
                 print(f"Audio path: {audio_path}")
 
@@ -190,7 +181,6 @@ class GeneralCog(commands.Cog):
                 await ctx.send("Sorry, I couldn't process your request at the moment.")
                 return
 
-        # Send text and play TTS simultaneously after the typing indicator stops
         async def send_text_and_play_tts():
             voice_client = ctx.guild.voice_client
             music_was_playing = False
@@ -208,7 +198,7 @@ class GeneralCog(commands.Cog):
             if audio_path and ctx.guild.voice_client:
                 voice_client = ctx.guild.voice_client
                 tts_source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(executable="C:/ffmpeg/bin/ffmpeg.exe", source=audio_path))
-                tts_source.volume = 4.0  # Adjust the volume for TTS
+                tts_source.volume = 4.0
                 voice_client.play(tts_source, after=on_finished_playing)
                 while voice_client.is_playing():
                     await asyncio.sleep(1)
@@ -221,11 +211,11 @@ class GeneralCog(commands.Cog):
             if music_was_playing and current_source:
                 await ctx.send("Resuming music...")
                 music_source = discord.PCMVolumeTransformer(current_source)
-                music_source.volume = 0.5  # Adjust the volume for music
+                music_source.volume = 0.5
                 voice_client.play(music_source, after=on_finished_playing)
 
-        # Run the text sending and TTS playback concurrently
         await asyncio.gather(send_text_and_play_tts())
+
 
     @commands.group(name='config', help='Configure settings for the bot')
     async def config(self, ctx):

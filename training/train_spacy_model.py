@@ -4,6 +4,7 @@ from spacy.util import minibatch, compounding
 import json
 import random
 from sklearn.model_selection import train_test_split
+import os
 
 # Load a blank spaCy model
 nlp = spacy.blank("en")
@@ -47,6 +48,9 @@ patience = 20  # Adjusted patience for early stopping
 n_epochs = 100  # Total number of epochs
 dropout_rate = 0.6  # Increased dropout rate
 
+# Ensure the models directory exists
+os.makedirs("models", exist_ok=True)
+
 # Training loop
 for epoch in range(n_epochs):
     random.shuffle(train_examples)  # Shuffle training examples
@@ -72,7 +76,8 @@ for epoch in range(n_epochs):
         best_loss = val_loss
         no_improvement_epochs = 0
         # Save the best model
-        nlp.to_disk("models/best_relationship_inquiry_model")
+        best_model_path = os.path.join("models", "best_relationship_inquiry_model")
+        nlp.to_disk(best_model_path)
         print(f"New best model saved with validation loss: {val_loss}")
     else:
         no_improvement_epochs += 1
@@ -82,5 +87,6 @@ for epoch in range(n_epochs):
         break
 
 # Save the final model after training
-nlp.to_disk("models/relationship_inquiry_model")
+final_model_path = os.path.join("models", "relationship_inquiry_model")
+nlp.to_disk(final_model_path)
 print("Final model saved.")

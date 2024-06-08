@@ -34,7 +34,7 @@ class BirthdayCog(commands.Cog):
             "https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExZ3FqODF5OGI1Y2o5MWM1bHh1djJ3OTRzZThhODZhdGo4MnlranI1ayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/IFjSbBHETzzr6GJdwW/giphy-downsized-large.gif"
         ]
         self.create_table_if_not_exists()
-        # self.daily_birthday_check.start() # Turn back on when you figure out how to not send another message if the message is already sent that day
+        self.daily_birthday_check.start() # Turn back on when you figure out how to not send another message if the message is already sent that day
 
     def create_table_if_not_exists(self):
         self.cursor.execute('''

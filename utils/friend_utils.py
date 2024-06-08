@@ -101,40 +101,60 @@ def find_relationships(person_name, target_friend_name):
 def handle_friend_inquiry(user_input, user_name, known_friend_names, nickname_to_full_name):
     doc = nlp(user_input)
 
-    # Collect friend data for all recognized entities
+    # Extract the queried friend's name
+    queried_friend_name = None
+    for ent in doc.ents:
+        if ent.label_ == "PERSON" and ent.text.lower() in known_friend_names:
+            queried_friend_name = ent.text.lower()
+            break
+    if not queried_friend_name:
+        for word in user_input.lower().split():
+            clean_word = word.strip(".,!?").lower()
+            if clean_word.endswith("'s"):
+                clean_word = clean_word[:-2]
+            if clean_word in known_friend_names:
+                queried_friend_name = clean_word
+                break
+
+    # Fallback to the user name if no friend is identified
+    if not queried_friend_name:
+        queried_friend_name = user_name.lower()
+
+    print(f"Queried friend name: {queried_friend_name}")
+
+    # Retrieve friend data
     friend_data_list = []
     detected_friends = set()
 
-    # Handle "me" explicitly
     if "me" in user_input.lower():
-        detected_friends.add(user_name.lower())
-        friend_data = get_friend_data(user_name.lower())
+        detected_friends.add(queried_friend_name)
+        friend_data = get_friend_data(queried_friend_name)
         if friend_data:
             friend_data_list.append(friend_data)
 
-    # Collect friend data for recognized entities
     for ent in doc.ents:
-        if ent.label_ == "PERSON" and ent.text.lower() in known_friend_names:
+        if ent.label_ == "PERSON" and ent.text.lower() == queried_friend_name:
             detected_friends.add(ent.text.lower())
             friend_data = get_friend_data(ent.text.lower())
             if friend_data:
                 friend_data_list.append(friend_data)
 
-    # Fallback to keyword matching for additional names
     for word in user_input.lower().split():
         clean_word = word.strip(".,!?").lower()
         if clean_word.endswith("'s"):
-            clean_word = clean_word[:-2]  # Remove 's from the word
-        if clean_word in known_friend_names and clean_word not in detected_friends:
+            clean_word = clean_word[:-2]
+        if clean_word == queried_friend_name and clean_word not in detected_friends:
             detected_friends.add(clean_word)
             friend_data = get_friend_data(clean_word)
             if friend_data:
                 friend_data_list.append(friend_data)
 
     if friend_data_list:
-        return friend_data_list
+        return friend_data_list, queried_friend_name
     else:
-        return None
+        return None, queried_friend_name
+
+
 
 # Function to handle relationship inquiry
 def handle_relationship_inquiry(user_input, friend_name, primary_person, known_friend_names):
