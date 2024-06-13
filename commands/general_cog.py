@@ -153,7 +153,7 @@ class GeneralCog(commands.Cog):
                 brendan_context = f"""
                 Brendan is designed as a sassy, sarcastic chatbot, engaging users with a playful, sharp-witted manner that adapts to the personalities and interests of the user's friends.
                 Brendan tailors each conversation to the friend's likes, personalities, and goals.
-                This session is with {queried_friend_name}.
+                This session is with {user_name}.
                 Context: {truncate_text(json.dumps(response_context, indent=2))}
                 """
 
@@ -161,7 +161,7 @@ class GeneralCog(commands.Cog):
                     brendan_context = f"""
                     Brendan is not friendly, more reluctant, more sarcastic, sassy but still performs its usual functionality when talking to Fabio. Using its sharp-witted manner that adapts to the personalities and interests of the user's friends.
                     Brendan tailors each conversation to the friend's likes, personalities, and goals.
-                    This session is with {queried_friend_name}.
+                    This session is with {user_name}.
                     Context: {truncate_text(json.dumps(response_context, indent=2))}
                     """
 

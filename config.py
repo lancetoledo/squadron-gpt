@@ -25,6 +25,9 @@ ELEVENLABS_API_URL = f'https://api.elevenlabs.io/v1/text-to-speech/{ELEVENLABS_V
 # Discord bot token
 DISCORD_BOT_TOKEN = os.getenv('DISCORD_BOT_TOKEN')
 
+# Free Astrology API key
+FREE_ASTROLOGY_API_KEY = os.getenv('FREE_ASTROLOGY_API_KEY')
+
 # spaCy model
 SPACY_MODEL = os.getenv('SPACY_MODEL')
 RELATIONSHIP_MODEL = os.getenv('RELATIONSHIP_MODEL')
