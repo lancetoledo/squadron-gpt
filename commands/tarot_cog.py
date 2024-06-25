@@ -1,6 +1,8 @@
 import discord
 from discord.ext import commands
 import random
+import openai
+import asyncio
 
 class TarotCard:
     def __init__(self, name, meaning_upright, meaning_reversed, image_url):
@@ -407,6 +409,78 @@ class TarotCog(commands.Cog):
             embed.add_field(name="Meaning", value=card.meaning_upright if is_upright else card.meaning_reversed, inline=False)
             
             await ctx.send(embed=embed)
+
+
+    # New command: !tarot_card_reading
+    # Perform a three-card spread reading using ChatGPT
+    @commands.command()
+    async def tarot_card_reading(self, ctx):
+        async with ctx.typing():
+            # Draw three cards
+            cards = random.sample(self.tarot_deck, 3)
+            positions = ["Past", "Present", "Future"]
+            card_positions = [random.choice(["Upright", "Reversed"]) for _ in range(3)]
+            
+            # Prepare card embeds
+            card_embeds = []
+            for card, position, card_position in zip(cards, positions, card_positions):
+                embed = discord.Embed(title=f"{position}: {card.name}", color=0x7289DA)
+                embed.set_image(url=card.image_url)
+                embed.add_field(name="Position", value=card_position, inline=False)
+                card_embeds.append(embed)
+
+            # Prepare the cards information for the API call
+            cards_info = [f"{pos}: {card.name} ({card_pos})" 
+                          for pos, card, card_pos in zip(positions, cards, card_positions)]
+            
+            # Prepare the context for the API call
+            context = """
+            You are an experienced and intuitive Tarot card reader, skilled in performing the three-card spread. Your role is to provide insightful, balanced, and thoughtful readings that help users gain new perspectives on their situations. The cards drawn for this reading are: {cards}
+
+            Remember these key points:
+            1. Approach: You approach each reading with empathy, objectivity, and an open mind. You're here to guide and offer insights, not to make definitive predictions.
+            2. Three-Card Spread: You specialize in the three-card spread. Interpret the cards as Past, Present, and Future.
+            3. Card Meanings: You have a deep understanding of Tarot symbolism and can interpret both the traditional and intuitive meanings of each card. Consider both upright and reversed positions as specified in {cards}.
+            4. Interconnected Reading: Don't just interpret each card in isolation. Explain how the cards in {cards} relate to each other and tell a cohesive story.
+            5. Ethical Considerations: Maintain high ethical standards. Avoid making absolute predictions about health, legal matters, or major life decisions. Instead, offer perspectives that empower the user to make their own choices.
+            6. Language: Use clear, respectful language. Avoid being overly dramatic or fear-mongering. Frame challenges as opportunities for growth.
+            7. Intuition: Trust your intuition to provide nuanced interpretations of {cards}, but always ground them in the traditional meanings of the cards.
+            8. User Interaction: Encourage users to reflect on the reading and find personal meaning in the cards drawn.
+            9. Scope: Stick to interpreting the three cards drawn in {cards}. Don't introduce additional cards.
+            10. Closing: End the reading with a summary that ties the insights from {cards} together and offers a constructive perspective on the user's situation.
+
+            Base your entire reading on the cards specified in {cards}.
+            """.format(cards=", ".join(cards_info))
+
+            # Make the API call to ChatGPT
+            response = await asyncio.to_thread(
+                openai.ChatCompletion.create,
+                model="gpt-4",  # or "gpt-3.5-turbo", depending on your preference and availability
+                messages=[
+                    {"role": "system", "content": context},
+                    {"role": "user", "content": "Provide a Tarot card reading based on the three cards drawn."}
+                ]
+            )
+
+            # Get the generated reading
+            reading = response.choices[0].message['content']
+
+            # Create the embed with the interpretation
+            interpretation_embed = discord.Embed(title="Tarot Card Reading Interpretation", color=0x7289DA)
+            
+            # Split the reading into smaller chunks to fit within Discord's embed field limits
+            chunk_size = 1024
+            chunks = [reading[i:i+chunk_size] for i in range(0, len(reading), chunk_size)]
+            
+            for i, chunk in enumerate(chunks):
+                interpretation_embed.add_field(name=f"Reading (Part {i+1})", value=chunk, inline=False)
+
+            interpretation_embed.set_footer(text="Remember, this reading is for entertainment purposes only. Always use your own judgment for important life decisions.")
+
+        # Send all messages
+        for embed in card_embeds:
+            await ctx.send(embed=embed)
+        await ctx.send(embed=interpretation_embed)
 
 async def setup(bot):
     await bot.add_cog(TarotCog(bot))
