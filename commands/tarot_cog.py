@@ -249,7 +249,8 @@ class TarotCog(commands.Cog):
                     "https://upload.wikimedia.org/wikipedia/commons/1/1c/Pents14.jpg")
         ]
 
-
+    # Example: !draw_card
+    # Draw a single card and provide quick insight or answer to a simple question.
     @commands.command()
     async def draw_card(self, ctx):
         card = random.choice(self.tarot_deck)
@@ -263,6 +264,8 @@ class TarotCog(commands.Cog):
         
         await ctx.send(embed=embed)
 
+    # Example: !timeline_spread
+    # The timeline spread provides insight into the past, present, and future of a situation.
     @commands.command()
     async def timeline_spread(self, ctx):
         cards = random.sample(self.tarot_deck, 3)
@@ -277,10 +280,124 @@ class TarotCog(commands.Cog):
             
             await ctx.send(embed=embed)
 
+    # Example: !cross_spread
+    # The cross spread offers an analysis of a specific question or situation, focusing on various factors influencing it.
     @commands.command()
     async def cross_spread(self, ctx):
         cards = random.sample(self.tarot_deck, 5)
         positions = ["Present", "Challenge", "Past", "Future", "Outcome"]
+        
+        for card, position in zip(cards, positions):
+            is_upright = random.choice([True, False])
+            embed = discord.Embed(title=f"{position} Card: {card.name}", color=0x7289DA)
+            embed.set_image(url=card.image_url)
+            embed.add_field(name="Position", value="Upright" if is_upright else "Reversed", inline=False)
+            embed.add_field(name="Meaning", value=card.meaning_upright if is_upright else card.meaning_reversed, inline=False)
+            
+            await ctx.send(embed=embed)
+
+    # Example: !celtic_cross_spread
+    # The Celtic Cross spread provides a detailed examination of a specific question or situation, considering multiple aspects and influences.
+    @commands.command()
+    async def celtic_cross_spread(self, ctx):
+        cards = random.sample(self.tarot_deck, 10)
+        positions = ["Present", "Challenge", "Past", "Future", "Goal", "Immediate Future", "Self-Perception", "External Influences", "Hopes and Fears", "Outcome"]
+        
+        for card, position in zip(cards, positions):
+            is_upright = random.choice([True, False])
+            embed = discord.Embed(title=f"{position} Card: {card.name}", color=0x7289DA)
+            embed.set_image(url=card.image_url)
+            embed.add_field(name="Position", value="Upright" if is_upright else "Reversed", inline=False)
+            embed.add_field(name="Meaning", value=card.meaning_upright if is_upright else card.meaning_reversed, inline=False)
+            
+            await ctx.send(embed=embed)
+
+    # Example: !horseshoe_spread
+    # The horseshoe spread offers insights into the present situation, obstacles, external influences, and possible outcomes.
+    @commands.command()
+    async def horseshoe_spread(self, ctx):
+        cards = random.sample(self.tarot_deck, 7)
+        positions = ["Past", "Present", "Hidden Influences", "Obstacles", "External Influences", "Suggested Actions", "Outcome"]
+        
+        for card, position in zip(cards, positions):
+            is_upright = random.choice([True, False])
+            embed = discord.Embed(title=f"{position} Card: {card.name}", color=0x7289DA)
+            embed.set_image(url=card.image_url)
+            embed.add_field(name="Position", value="Upright" if is_upright else "Reversed", inline=False)
+            embed.add_field(name="Meaning", value=card.meaning_upright if is_upright else card.meaning_reversed, inline=False)
+            
+            await ctx.send(embed=embed)
+
+    # Example: !five_card_spread
+    # The five-card spread provides a deeper look into a situation, exploring causes, hidden factors, advice, and potential outcomes.
+    @commands.command()
+    async def five_card_spread(self, ctx):
+        cards = random.sample(self.tarot_deck, 5)
+        positions = ["Present Situation", "Causes", "Hidden Factors", "Advice", "Likely Outcome"]
+        
+        for card, position in zip(cards, positions):
+            is_upright = random.choice([True, False])
+            embed = discord.Embed(title=f"{position} Card: {card.name}", color=0x7289DA)
+            embed.set_image(url=card.image_url)
+            embed.add_field(name="Position", value="Upright" if is_upright else "Reversed", inline=False)
+            embed.add_field(name="Meaning", value=card.meaning_upright if is_upright else card.meaning_reversed, inline=False)
+            
+            await ctx.send(embed=embed)
+
+    # Example: !seven_card_horseshoe_spread
+    # The seven-card horseshoe spread provides a detailed exploration of a situation and its various influences, offering advice and potential outcomes.
+    @commands.command()
+    async def seven_card_horseshoe_spread(self, ctx):
+        cards = random.sample(self.tarot_deck, 7)
+        positions = ["Past", "Present", "Future", "Advice", "External Influences", "Hopes and Fears", "Outcome"]
+        
+        for card, position in zip(cards, positions):
+            is_upright = random.choice([True, False])
+            embed = discord.Embed(title=f"{position} Card: {card.name}", color=0x7289DA)
+            embed.set_image(url=card.image_url)
+            embed.add_field(name="Position", value="Upright" if is_upright else "Reversed", inline=False)
+            embed.add_field(name="Meaning", value=card.meaning_upright if is_upright else card.meaning_reversed, inline=False)
+            
+            await ctx.send(embed=embed)
+
+    # Example: !astrological_spread
+    # The astrological spread provides insight into different aspects of life based on the twelve astrological houses.
+    @commands.command()
+    async def astrological_spread(self, ctx):
+        cards = random.sample(self.tarot_deck, 12)
+        positions = ["Self", "Money", "Communication", "Home", "Pleasure", "Work", "Partnerships", "Shared Resources", "Philosophy", "Career", "Friendships", "Subconscious"]
+        
+        for card, position in zip(cards, positions):
+            is_upright = random.choice([True, False])
+            embed = discord.Embed(title=f"{position} House: {card.name}", color=0x7289DA)
+            embed.set_image(url=card.image_url)
+            embed.add_field(name="Position", value="Upright" if is_upright else "Reversed", inline=False)
+            embed.add_field(name="Meaning", value=card.meaning_upright if is_upright else card.meaning_reversed, inline=False)
+            
+            await ctx.send(embed=embed)
+
+    # Example: !relationship_spread
+    # The relationship spread provides insight into romantic relationships or partnerships, examining both parties and the relationship dynamics.
+    @commands.command()
+    async def relationship_spread(self, ctx):
+        cards = random.sample(self.tarot_deck, 5)
+        positions = ["You", "Your Partner", "Relationship Foundation", "Current State", "Future of the Relationship"]
+        
+        for card, position in zip(cards, positions):
+            is_upright = random.choice([True, False])
+            embed = discord.Embed(title=f"{position} Card: {card.name}", color=0x7289DA)
+            embed.set_image(url=card.image_url)
+            embed.add_field(name="Position", value="Upright" if is_upright else "Reversed", inline=False)
+            embed.add_field(name="Meaning", value=card.meaning_upright if is_upright else card.meaning_reversed, inline=False)
+            
+            await ctx.send(embed=embed)
+
+    # Example: !career_path_spread
+    # The career path spread provides guidance and insight into career-related questions, examining current job, challenges, skills, opportunities, and future path.
+    @commands.command()
+    async def career_path_spread(self, ctx):
+        cards = random.sample(self.tarot_deck, 5)
+        positions = ["Current Job", "Career Challenges", "Skills and Talents", "Potential Opportunities", "Future Career Path"]
         
         for card, position in zip(cards, positions):
             is_upright = random.choice([True, False])
