@@ -455,7 +455,7 @@ class TarotCog(commands.Cog):
             # Make the API call to ChatGPT
             response = await asyncio.to_thread(
                 openai.ChatCompletion.create,
-                model="gpt-4",  # or "gpt-3.5-turbo", depending on your preference and availability
+                model="gpt-4o",  # or "gpt-3.5-turbo", depending on your preference and availability
                 messages=[
                     {"role": "system", "content": context},
                     {"role": "user", "content": "Provide a Tarot card reading based on the three cards drawn."}
