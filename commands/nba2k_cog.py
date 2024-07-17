@@ -79,26 +79,25 @@ class NBA2KCog(commands.Cog):
 
     async def relay_to_admin(self, ctx, request_type: str):
         admin = await self.bot.fetch_user(self.admin_id)
-        await admin.send(f"{ctx.author.name} is requesting {request_type} in {ctx.channel.name}. Please respond with the information.")
+        await admin.send(f"{ctx.author.name} is requesting {request_type}. Please respond with the information.")
         await ctx.send(f"Your request for {request_type} has been sent to the admin. Please wait for a response.")
 
         def check(m):
             return m.author.id == self.admin_id and isinstance(m.channel, discord.DMChannel)
 
         try:
-            admin_response = await self.bot.wait_for('message', check=check, timeout=300.0)
+            # Changed from 300 seconds (5 minutes) to 7200 seconds (2 hours)
+            admin_response = await self.bot.wait_for('message', check=check, timeout=7200.0)
             
-            title, content = self.split_title_content(admin_response.content)
-            formatted_content = self.format_message(content)
-
-            # Use the generated title if admin didn't provide one
-            if not title:
-                title = self.generate_title(request_type)
-
-            embed = self.create_embed(title, formatted_content)
-            await ctx.send(embed=embed)
+            formatted_message = self.format_message(admin_response.content)
+            
+            channel = self.bot.get_channel(self.nba2k_channel_id)
+            await channel.send(f"**{request_type.capitalize()}**\n\n{formatted_message}")
+            
+            if ctx.channel.id != self.nba2k_channel_id:
+                await ctx.send(f"Your requested information has been posted in the NBA2K channel.")
         except asyncio.TimeoutError:
-            await ctx.send("The admin did not respond in time. Please try your request again later.")
+            await ctx.send("The admin did not respond within 2 hours. Please try your request again later.")
 
     @commands.command(name='myplayer', help='Get information about your player')
     async def my_player(self, ctx):
