@@ -217,7 +217,7 @@ class NBA2KCog(commands.Cog):
 
         await channel.send(message)
 
-    # !myinterests
+    # !myinterests - shows interest in the game
     @commands.command(name='myinterests', help='View your current free agent interests')
     async def my_interests(self, ctx):
         if ctx.author.id not in self.user_interests or not self.user_interests[ctx.author.id]:
