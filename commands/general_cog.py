@@ -6,6 +6,7 @@ import openai
 import json
 import asyncio
 import os
+import shlex  # Import shlex for shell-like parsing
 
 from config import STATIC_FRIEND_DATA, DISCORD_TO_REAL_NAME
 from utils.context_management import update_history_with_extracted_info, truncate_history, summarize_conversation, split_message
@@ -30,6 +31,7 @@ class GeneralCog(commands.Cog):
         self.session_histories = {}
         self.session_contexts = {}
         self.known_friend_names, self.nickname_to_full_name = self.extract_friend_names()
+        self.active_polls = {}  # Dictionary to store active polls
 
     # Function to extract friend names from JSON files and static data
     def extract_friend_names(self):
@@ -237,6 +239,105 @@ class GeneralCog(commands.Cog):
     async def config_birthday_role(self, ctx, role: discord.Role):
         await ctx.send(f"Birthday role set to {role.name}.")
         logger.debug(f'Birthday role set to {role.name}')
+
+    # Usage: !poll "Who is the best NBA player?" "Nikola Jokic" "Dequan Foster" "Joel Embiid"
+    @commands.command(name='poll', help='Create a poll with multiple options. Use quotes for options with spaces.')
+    async def create_poll(self, ctx, *, args):
+        # Parse the arguments using shlex
+        try:
+            parsed_args = shlex.split(args)
+        except ValueError as e:
+            await ctx.send(f"Error parsing arguments: {e}. Make sure to close all quotes.")
+            return
+
+        # Ensure we have at least a question and two options
+        if len(parsed_args) < 3:
+            await ctx.send("You need to provide a question and at least two options for the poll.")
+            return
+
+        question = parsed_args[0]
+        options = parsed_args[1:]
+
+        # Define emoji options for poll choices
+        emoji_options = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
+        
+        # Check if the number of options doesn't exceed the available emojis
+        if len(options) > len(emoji_options):
+            await ctx.send(f"The maximum number of options is {len(emoji_options)}.")
+            return
+
+        # Create the poll description with emojis and options
+        description = "\n".join(f"{emoji_options[i]} {option}" for i, option in enumerate(options))
+
+        # Create an embedded message for the poll
+        embed = discord.Embed(
+            title=question,
+            description=description,
+            color=discord.Color.blue()
+        )
+        embed.set_footer(text="React with the corresponding emoji to vote!")
+
+        # Send the poll message and store it
+        poll_message = await ctx.send(embed=embed)
+
+        # Add reaction emojis to the message
+        for i in range(len(options)):
+            await poll_message.add_reaction(emoji_options[i])
+
+        # Store the poll information
+        self.active_polls[poll_message.id] = {
+            'question': question,
+            'options': options,
+            'votes': {emoji: set() for emoji in emoji_options[:len(options)]}
+        }
+
+    @commands.Cog.listener()
+    async def on_reaction_add(self, reaction, user):
+        # Ignore bot reactions
+        if user.bot:
+            return
+
+        message = reaction.message
+        # Check if the reaction is for an active poll
+        if message.id in self.active_polls:
+            poll = self.active_polls[message.id]
+            emoji = str(reaction.emoji)
+
+            # If the emoji is valid for this poll
+            if emoji in poll['votes']:
+                # Remove user's previous votes
+                for vote_set in poll['votes'].values():
+                    vote_set.discard(user.id)
+
+                # Add user's new vote
+                poll['votes'][emoji].add(user.id)
+
+                # Update the poll results
+                await self.update_poll_results(message, poll)
+
+    async def update_poll_results(self, message, poll):
+        emoji_options = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
+        description = ""
+
+        # Generate the updated poll results
+        for i, option in enumerate(poll['options']):
+            emoji = emoji_options[i]
+            vote_count = len(poll['votes'][emoji])
+            # Calculate the length of the progress bar
+            bar_length = min(int((vote_count / len(message.guild.members)) * 20), 20)
+            bar = '█' * bar_length + '░' * (20 - bar_length)
+            description += f"{emoji} {option}\n{bar} {vote_count} votes\n\n"
+
+        # Create an updated embed with the new results
+        embed = discord.Embed(
+            title=poll['question'],
+            description=description,
+            color=discord.Color.blue()
+        )
+        embed.set_footer(text="React with the corresponding emoji to vote!")
+
+        # Edit the original message with the updated results
+        await message.edit(embed=embed)
 
 async def setup(bot):
     await bot.add_cog(GeneralCog(bot))
