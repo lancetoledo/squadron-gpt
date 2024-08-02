@@ -39,6 +39,21 @@ class NBA2KCog(commands.Cog):
         with open(json_path, 'r') as f:
             self.nba2k_data = json.load(f)
 
+    def get_team_data(self, user_id):
+        for team in self.nba2k_data['teams']:
+            if team['staff']['gm']['userid'] == user_id:
+                return team
+        return None
+
+    def get_player_info(self, user_id):
+        team_data = self.get_team_data(user_id)
+        if team_data:
+            gm_name = team_data['staff']['gm']['name']
+            for player in team_data['roster']:
+                if player['name'] == gm_name:
+                    return player
+        return None
+
     # !send # Important Update\nThe league draft will be held next Friday at 8 PM EST.
     @commands.command(name='send', help='Send an embedded message to the specified channel')
     @commands.has_permissions(administrator=True)
@@ -118,25 +133,12 @@ class NBA2KCog(commands.Cog):
 
     @commands.command(name='myteam', help='Get information about your team')
     async def my_team(self, ctx):
-        team_info = self.get_team_info(ctx.author.id)
+        team_info = self.get_team_data(ctx.author.id)
         if team_info:
             embed = self.create_team_embed(team_info)
             await ctx.send(embed=embed)
         else:
             await ctx.send("You don't have a team in this league. Please contact an admin if you believe this is an error.")
-
-    def get_player_info(self, user_id):
-        if self.nba2k_data['staff']['gm']['userid'] == user_id:
-            gm_name = self.nba2k_data['staff']['gm']['name']
-            for player in self.nba2k_data['roster']:
-                if player['name'] == gm_name:
-                    return player
-        return None
-
-    def get_team_info(self, user_id):
-        if self.nba2k_data['staff']['gm']['userid'] == user_id:
-            return self.nba2k_data
-        return None
 
     def create_player_embed(self, player):
         embed = discord.Embed(title=f"{player['name']} - {player['position']}", color=discord.Color.blue())
@@ -155,7 +157,14 @@ class NBA2KCog(commands.Cog):
     def create_team_embed(self, team_data):
         embed = discord.Embed(title=f"{team_data['team']['name']} - {team_data['season']} Season", color=discord.Color.gold())
         embed.add_field(name="Arena", value=team_data['team']['arena'], inline=True)
-        embed.add_field(name="Cap Space", value=f"${team_data['team']['capSpace']:,}", inline=True)
+        
+        # Parse and format cap space
+        cap_space = team_data['team']['capSpace']
+        # Extract the numeric value and convert to float
+        cap_value = float(re.sub(r'[^\d.]', '', cap_space))
+        # Format the cap space value
+        formatted_cap = f"${cap_value:.2f}M"
+        embed.add_field(name="Cap Space", value=formatted_cap, inline=True)
         
         # Sort players by overall rating
         sorted_players = sorted(team_data['roster'], key=lambda x: x['overall'], reverse=True)
