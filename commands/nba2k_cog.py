@@ -1,3 +1,4 @@
+import json
 import discord
 from discord.ext import commands
 from enum import Enum
@@ -5,6 +6,7 @@ from typing import Dict, List
 import asyncio
 import re
 from datetime import datetime, timedelta
+import os
 
 
 class TradeStatus(Enum):
@@ -30,6 +32,7 @@ class NBA2KCog(commands.Cog):
         self.free_agents = {}  # {player_name: [list of interested user IDs]}
         self.user_interests = {}  # {user_id: [list of interested player names]}
         self.free_agency_end_time = None
+        self.trade_requests = {}
 
     # !send # Important Update\nThe league draft will be held next Friday at 8 PM EST.
     @commands.command(name='send', help='Send an embedded message to the specified channel')
@@ -101,11 +104,71 @@ class NBA2KCog(commands.Cog):
 
     @commands.command(name='myplayer', help='Get information about your player')
     async def my_player(self, ctx):
-        await self.relay_to_admin(ctx, "player information")
+        player_info = self.get_player_info(ctx.author.id)
+        if player_info:
+            embed = self.create_player_embed(player_info)
+            await ctx.send(embed=embed)
+        else:
+            await ctx.send("You don't have a player in this league. Please contact an admin if you believe this is an error.")
 
     @commands.command(name='myteam', help='Get information about your team')
     async def my_team(self, ctx):
-        await self.relay_to_admin(ctx, "team information")
+        team_info = self.get_team_info(ctx.author.id)
+        if team_info:
+            embed = self.create_team_embed(team_info)
+            await ctx.send(embed=embed)
+        else:
+            await ctx.send("You don't have a team in this league. Please contact an admin if you believe this is an error.")
+
+    def get_player_info(self, user_id):
+        if self.nba2k_data['staff']['gm']['userid'] == user_id:
+            gm_name = self.nba2k_data['staff']['gm']['name']
+            for player in self.nba2k_data['roster']:
+                if player['name'] == gm_name:
+                    return player
+        return None
+
+    def get_team_info(self, user_id):
+        if self.nba2k_data['staff']['gm']['userid'] == user_id:
+            return self.nba2k_data
+        return None
+
+    def create_player_embed(self, player):
+        embed = discord.Embed(title=f"{player['name']} - {player['position']}", color=discord.Color.blue())
+        embed.add_field(name="Overall", value=player['overall'], inline=True)
+        embed.add_field(name="Age", value=player['age'], inline=True)
+        embed.add_field(name="Years in NBA", value=player['yearsInNBA'], inline=True)
+        embed.add_field(name="Potential", value=player['potential'], inline=True)
+        embed.add_field(name="Skills", value=', '.join(player['skills']), inline=False)
+        embed.add_field(name="Contract Years Left", value=player['contract']['yearsLeft'], inline=True)
+        if player['narratives']:
+            embed.add_field(name="Narratives", value='\n'.join(player['narratives']), inline=False)
+        if player['rivals']:
+            embed.add_field(name="Rivals", value=', '.join(player['rivals']), inline=False)
+        return embed
+
+    def create_team_embed(self, team_data):
+        embed = discord.Embed(title=f"{team_data['team']['name']} - {team_data['season']} Season", color=discord.Color.gold())
+        embed.add_field(name="Arena", value=team_data['team']['arena'], inline=True)
+        embed.add_field(name="Cap Space", value=f"${team_data['team']['capSpace']:,}", inline=True)
+        
+        # Top players
+        top_players = sorted(team_data['roster'], key=lambda x: x['overall'], reverse=True)[:5]
+        embed.add_field(name="Top Players", value='\n'.join([f"{p['name']} ({p['overall']} OVR)" for p in top_players]), inline=False)
+        
+        # Staff
+        embed.add_field(name="Head Coach", value=f"{team_data['staff']['headCoach']['name']} ({team_data['staff']['headCoach']['overallRating']} OVR)", inline=False)
+        embed.add_field(name="GM", value=team_data['staff']['gm']['name'], inline=True)
+        
+        # Goals
+        embed.add_field(name="Short Term Goal", value=team_data['goals']['shortTerm'], inline=False)
+        embed.add_field(name="Long Term Goal", value=team_data['goals']['longTerm'], inline=False)
+        
+        # Rivals
+        if team_data['rivals']:
+            embed.add_field(name="Team Rivals", value=', '.join(team_data['rivals']), inline=False)
+        
+        return embed
 
     @commands.command(name='mystats', help='Get your player stats')
     async def my_stats(self, ctx):
