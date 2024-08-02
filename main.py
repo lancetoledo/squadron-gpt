@@ -15,7 +15,6 @@ async def load_cogs(bot):
         'commands.music_cog',
         'commands.birthday_cog',
         'commands.general_cog',
-        'commands.astrology_cog',
         'commands.tarot_cog',
         'commands.nba2k_cog'
     ]

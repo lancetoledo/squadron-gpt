@@ -33,6 +33,11 @@ class NBA2KCog(commands.Cog):
         self.user_interests = {}  # {user_id: [list of interested player names]}
         self.free_agency_end_time = None
         self.trade_requests = {}
+        
+        # Load the JSON data
+        json_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'MyNBA.json')
+        with open(json_path, 'r') as f:
+            self.nba2k_data = json.load(f)
 
     # !send # Important Update\nThe league draft will be held next Friday at 8 PM EST.
     @commands.command(name='send', help='Send an embedded message to the specified channel')
@@ -152,9 +157,18 @@ class NBA2KCog(commands.Cog):
         embed.add_field(name="Arena", value=team_data['team']['arena'], inline=True)
         embed.add_field(name="Cap Space", value=f"${team_data['team']['capSpace']:,}", inline=True)
         
-        # Top players
-        top_players = sorted(team_data['roster'], key=lambda x: x['overall'], reverse=True)[:5]
-        embed.add_field(name="Top Players", value='\n'.join([f"{p['name']} ({p['overall']} OVR)" for p in top_players]), inline=False)
+        # Sort players by overall rating
+        sorted_players = sorted(team_data['roster'], key=lambda x: x['overall'], reverse=True)
+        
+        # Top 5 players
+        top_players = sorted_players[:5]
+        top_players_text = '\n'.join([f"{p['name']} ({p['overall']} OVR) - {p['position']}" for p in top_players])
+        embed.add_field(name="Top Players", value=top_players_text, inline=False)
+        
+        # Rest of the roster
+        other_players = sorted_players[5:]
+        other_players_text = '\n'.join([f"{p['name']} ({p['overall']} OVR) - {p['position']}" for p in other_players])
+        embed.add_field(name="Rest of Roster", value=other_players_text if other_players_text else "No other players", inline=False)
         
         # Staff
         embed.add_field(name="Head Coach", value=f"{team_data['staff']['headCoach']['name']} ({team_data['staff']['headCoach']['overallRating']} OVR)", inline=False)
