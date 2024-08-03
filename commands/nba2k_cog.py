@@ -1,6 +1,8 @@
 import json
 import discord
 from discord.ext import commands
+from discord import ButtonStyle
+from discord.ui import Button, View
 from enum import Enum
 from typing import Dict, List
 import asyncio
@@ -122,14 +124,64 @@ class NBA2KCog(commands.Cog):
         except asyncio.TimeoutError:
             await ctx.send("The admin did not respond within 2 hours. Please try your request again later.")
 
-    @commands.command(name='myplayer', help='Get information about your player')
+    @commands.command(name='myplayer', help='Get detailed information about your player')
     async def my_player(self, ctx):
         player_info = self.get_player_info(ctx.author.id)
         if player_info:
             embed = self.create_player_embed(player_info)
-            await ctx.send(embed=embed)
+            view = self.create_stats_button(ctx.author.id)
+            await ctx.send(embed=embed, view=view)
         else:
             await ctx.send("You don't have a player in this league. Please contact an admin if you believe this is an error.")
+
+    def create_player_embed(self, player):
+        embed = discord.Embed(title=f"{player['name']} - {player['position']}", color=discord.Color.blue())
+        embed.add_field(name="Overall", value=player['overall'], inline=True)
+        embed.add_field(name="Age", value=player['age'], inline=True)
+        embed.add_field(name="Years in NBA", value=player['yearsInNBA'], inline=True)
+        embed.add_field(name="Potential", value=player['potential'], inline=True)
+        embed.add_field(name="Skills", value=', '.join(player['skills']), inline=False)
+        embed.add_field(name="Contract Years Left", value=player['contract']['yearsLeft'], inline=True)
+        
+        if 'stats' in player:
+            stats = player['stats']
+            stats_text = f"PPG: {stats['ppg']} | RPG: {stats['rpg']} | APG: {stats['apg']}"
+            embed.add_field(name="Key Stats", value=stats_text, inline=False)
+        
+        if player['narratives']:
+            embed.add_field(name="Narratives", value='\n'.join(player['narratives']), inline=False)
+        if player['rivals']:
+            embed.add_field(name="Rivals", value=', '.join(player['rivals']), inline=False)
+        return embed
+
+    def create_stats_button(self, user_id):
+        view = View()
+        button = Button(style=ButtonStyle.primary, label="View Detailed Stats", custom_id=f"stats_{user_id}")
+        button.callback = self.stats_button_callback
+        view.add_item(button)
+        return view
+
+    async def stats_button_callback(self, interaction: discord.Interaction):
+        custom_id = interaction.data['custom_id']
+        user_id = int(custom_id.split('_')[1])
+        if interaction.user.id != user_id:
+            await interaction.response.send_message("You can only view your own stats.", ephemeral=True)
+            return
+        
+        await interaction.response.defer()
+        
+        player_info = self.get_player_info(user_id)
+        if not player_info or 'stats' not in player_info:
+            await interaction.followup.send("Stats not available for your player.")
+            return
+
+        stats = player_info['stats']
+        embed = discord.Embed(title=f"{player_info['name']}'s Detailed Stats", color=discord.Color.green())
+        embed.add_field(name="Scoring", value=f"PPG: {stats['ppg']}\nFG%: {stats['fgp']}%\n3P%: {stats['tpp']}%\nFT%: {stats['ftp']}%", inline=True)
+        embed.add_field(name="Other", value=f"RPG: {stats['rpg']}\nAPG: {stats['apg']}\nSPG: {stats['spg']}\nBPG: {stats['bpg']}", inline=True)
+        
+        await interaction.followup.send(embed=embed)
+
 
     @commands.command(name='myteam', help='Get information about your team')
     async def my_team(self, ctx):
@@ -195,7 +247,19 @@ class NBA2KCog(commands.Cog):
 
     @commands.command(name='mystats', help='Get your player stats')
     async def my_stats(self, ctx):
-        await self.relay_to_admin(ctx, "player stats")
+        player_info = self.get_player_info(ctx.author.id)
+        if not player_info or 'stats' not in player_info:
+            await ctx.send("Stats not available for your player.")
+            return
+
+        stats = player_info['stats']
+        embed = discord.Embed(title=f"{player_info['name']}'s Detailed Stats", color=discord.Color.green())
+        embed.add_field(name="Scoring", value=f"PPG: {stats['ppg']}\nFG%: {stats['fgp']}%\n3P%: {stats['tpp']}%\nFT%: {stats['ftp']}%", inline=True)
+        embed.add_field(name="Other", value=f"RPG: {stats['rpg']}\nAPG: {stats['apg']}\nSPG: {stats['spg']}\nBPG: {stats['bpg']}", inline=True)
+        
+        # You can add more detailed stats here
+
+        await ctx.send(embed=embed)
 
     @commands.command(name='myattributes', help='Get your player attributes')
     async def my_attributes(self, ctx):
@@ -348,10 +412,10 @@ class NBA2KCog(commands.Cog):
 
     async def add_admin_buttons(self, message, user_id):
         view = discord.ui.View()
-        view.add_item(discord.ui.Button(style=discord.ButtonStyle.green, label="Approve", custom_id=f"approve_{user_id}"))
-        view.add_item(discord.ui.Button(style=discord.ButtonStyle.red, label="Deny", custom_id=f"deny_{user_id}"))
-        view.add_item(discord.ui.Button(style=discord.ButtonStyle.grey, label="Request More Info", custom_id=f"more_info_{user_id}"))
-        view.add_item(discord.ui.Button(style=discord.ButtonStyle.blurple, label="Propose Trade", custom_id=f"propose_{user_id}"))
+        view.add_item(discord.ui.Button(style=ButtonStyle.green, label="Approve", custom_id=f"approve_{user_id}"))
+        view.add_item(discord.ui.Button(style=ButtonStyle.red, label="Deny", custom_id=f"deny_{user_id}"))
+        view.add_item(discord.ui.Button(style=ButtonStyle.grey, label="Request More Info", custom_id=f"more_info_{user_id}"))
+        view.add_item(discord.ui.Button(style=ButtonStyle.blurple, label="Propose Trade", custom_id=f"propose_{user_id}"))
         
         async def button_callback(interaction: discord.Interaction):
             if interaction.user.id != self.admin_id:
