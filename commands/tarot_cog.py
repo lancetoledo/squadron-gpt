@@ -173,7 +173,7 @@ class TarotCog(commands.Cog):
                 "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Swords02.jpg/800px-Swords02.jpg"),
         TarotCard("Three of Swords", "Heartbreak, emotional pain, sorrow, grief, rejection", 
                 "Healing, optimism, releasing pain", 
-                "https://en.wikipedia.org/wiki/Rider%E2%80%93Waite_Tarot#/media/File:Swords03.jpg"),
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Swords03.jpg/800px-Swords03.jpg"),
         TarotCard("Four of Swords", "Rest, relaxation, meditation, contemplation, recuperation", 
                 "Inner peace, healing, mental preparation", 
                 "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Swords04.jpg/800px-Swords04.jpg"),
