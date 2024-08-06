@@ -9,6 +9,10 @@ import asyncio
 import re
 from datetime import datetime, timedelta
 import os
+import firebase_admin
+from firebase_admin import credentials, firestore
+from google.cloud.firestore_v1.field_path import FieldPath
+
 
 
 class TradeStatus(Enum):
@@ -35,11 +39,53 @@ class NBA2KCog(commands.Cog):
         self.user_interests = {}  # {user_id: [list of interested player names]}
         self.free_agency_end_time = None
         self.trade_requests = {}
+        self.db = None  # We'll initialize this in cog_load
         
         # Load the JSON data
         json_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'MyNBA.json')
         with open(json_path, 'r') as f:
             self.nba2k_data = json.load(f)
+
+    async def cog_load(self):
+        # Initialize Firebase
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        key_path = os.path.join(current_dir, '..', 'data', 'firebase', 'nba-goat-calculator-e4983-firebase-adminsdk-jbrx7-32c0936656.json')
+        cred = credentials.Certificate(key_path)
+        firebase_admin.initialize_app(cred)
+        self.db = firestore.client()
+        
+        # Start the Firebase listener
+        players_ref = self.db.collection('players')
+        
+        def on_snapshot(doc_snapshot, changes, read_time):
+            for change in changes:
+                if change.type.name == 'MODIFIED':
+                    asyncio.create_task(self.handle_player_update(change.document))
+        
+        players_ref.on_snapshot(on_snapshot)
+
+    async def handle_player_update(self, player_doc):
+        player_data = player_doc.to_dict()
+        channel = self.bot.get_channel(self.nba2k_channel_id)
+        
+        old_goat_points = player_data.get('old_Total GOAT Points', 0)
+        new_goat_points = player_data.get('Total GOAT Points', 0)
+        
+        if new_goat_points > old_goat_points:
+            await channel.send(f"🏆 {player_data['Player Name']} has earned {new_goat_points - old_goat_points} new G.O.A.T points! Their total is now {new_goat_points}.")
+        
+        old_achievements = set(player_data.get('old_Achievements', []))
+        new_achievements = set(player_data.get('Achievements', []))
+        earned_achievements = new_achievements - old_achievements
+        
+        for achievement in earned_achievements:
+            await channel.send(f"🎉 Congratulations to {player_data['Player Name']} for earning the '{achievement}' achievement!")
+        
+        # Update the 'old' fields for future comparisons
+        player_doc.reference.update({
+            'old_Total GOAT Points': new_goat_points,
+            'old_Achievements': list(new_achievements)
+        })
 
     def get_team_data(self, user_id):
         for team in self.nba2k_data['teams']:
@@ -264,6 +310,65 @@ class NBA2KCog(commands.Cog):
     @commands.command(name='myattributes', help='Get your player attributes')
     async def my_attributes(self, ctx):
         await self.relay_to_admin(ctx, "player attributes")
+
+    @commands.command(name='leaderboard', help='View the G.O.A.T points leaderboard')
+    async def leaderboard(self, ctx):
+        try:
+            # Use a simple string for the field name
+            total_goat_points_field = 'Total GOAT Points'
+            
+            print(f"Attempting to query Firestore with field: {total_goat_points_field}")
+            
+            # Fetch all players and sort them in Python
+            players = self.db.collection('players').get()
+            
+            # Sort players by GOAT points
+            sorted_players = sorted(
+                players, 
+                key=lambda x: x.to_dict().get(total_goat_points_field, 0),
+                reverse=True
+            )[:10]  # Get top 10
+            
+            embed = discord.Embed(title="G.O.A.T Points Leaderboard", color=discord.Color.gold())
+            
+            for i, player in enumerate(sorted_players, 1):
+                player_data = player.to_dict()
+                print(f"Player data: {player_data}")  # Debug print
+                
+                goat_points = player_data.get(total_goat_points_field, 0)
+                player_name = player_data.get('Player Name', 'Unknown Player')
+                
+                embed.add_field(
+                    name=f"{i}. {player_name}", 
+                    value=f"{goat_points:,} points", 
+                    inline=False
+                )
+
+            if not sorted_players:
+                embed.description = "No players found in the leaderboard."
+
+            await ctx.send(embed=embed)
+        
+        except Exception as e:
+            error_message = f"An error occurred while fetching the leaderboard: {str(e)}"
+            await ctx.send(error_message)
+            print(f"Leaderboard Error: {error_message}")
+            
+            # Print the full traceback for debugging
+            traceback.print_exc()
+            
+            # Additional debug information
+            print(f"Firestore database: {self.db}")
+            print(f"Players collection: {self.db.collection('players')}")
+            
+            # Try to print a sample document
+            try:
+                sample_doc = next(self.db.collection('players').limit(1).stream())
+                print(f"Sample document: {sample_doc.to_dict()}")
+            except StopIteration:
+                print("No documents found in the 'players' collection.")
+            except Exception as sample_error:
+                print(f"Error fetching sample document: {str(sample_error)}")
 
     @commands.command(name='standings', help='Get league standings')
     async def standings(self, ctx):
