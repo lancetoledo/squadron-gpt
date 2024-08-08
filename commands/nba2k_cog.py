@@ -121,49 +121,56 @@ class NBA2KCog(commands.Cog):
         firebase_data = None
         local_data = None
 
-        # Fetch data from Firebase
+        team_data = self.get_team_data(user_id)
+        if not team_data or 'staff' not in team_data or 'gm' not in team_data['staff']:
+            logging.warning(f"No team data found for user ID: {user_id}")
+            return None
+
+        gm_name = team_data['staff']['gm']['name']
+        print(f"GM name found: {gm_name}")  # Print statement
+
         try:
             logging.info("Attempting to fetch data from Firebase")
-            players_ref = self.db.collection('players')
-            query = players_ref.where(filter=firestore.FieldFilter("discordId", "==", str(user_id)))
-            docs = query.get()
-
-            for doc in docs:
-                firebase_data = doc.to_dict()
-                logging.info(f"Firebase data fetched: {firebase_data}")
-                break
+            players = self.db.collection('players').get()
+            
+            for doc in players:
+                player_data = doc.to_dict()
+                if player_data.get('Player Name') == gm_name:
+                    firebase_data = {
+                        'Total GOAT Points': player_data.get('Total GOAT Points', 0),
+                        'Tier': player_data.get('Tier', 'N/A'),
+                        'Achievements': {
+                            achievement: value
+                            for achievement, value in player_data.get('Achievements', {}).items()
+                            if value is True or (isinstance(value, (int, float)) and value > 0)
+                        }
+                    }
+                    print(f"Firebase data extracted: {firebase_data}")  # Print statement
+                    break
+            
+            if not firebase_data:
+                print(f"No player found in Firebase with name: {gm_name}")  # Print statement
         except Exception as e:
             logging.error(f"Error fetching data from Firebase: {str(e)}", exc_info=True)
 
-        # If Firebase data is not available, proceed with local data
-        if not firebase_data:
-            logging.warning("Firebase data not available, proceeding with local data only")
+        for player in team_data.get('roster', []):
+            if player['name'] == gm_name:
+                local_data = player
+                print(f"Local data fetched: {local_data}")  # Print statement
+                break
 
-        # Fetch data from local JSON
-        logging.info("Fetching data from local JSON")
-        team_data = self.get_team_data(user_id)
-        if team_data:
-            gm_name = team_data['staff']['gm']['name']
-            for player in team_data['roster']:
-                if player['name'] == gm_name:
-                    local_data = player
-                    logging.info(f"Local data fetched: {local_data}")
-                    break
-
-        # Combine the data
         if firebase_data and local_data:
-            logging.info("Combining Firebase and local data")
             combined_data = {**local_data, **firebase_data}
-            logging.info(f"Combined data: {combined_data}")
+            print(f"Combined data: {combined_data}")  # Print statement
             return combined_data
         elif firebase_data:
-            logging.info("Returning Firebase data only")
+            print(f"Returning Firebase data only: {firebase_data}")  # Print statement
             return firebase_data
         elif local_data:
-            logging.info("Returning local data only")
+            print(f"Returning local data only: {local_data}")  # Print statement
             return local_data
         
-        logging.warning("No player data found")
+        print(f"No player data found for GM: {gm_name}")  # Print statement
         return None
 
     # !send # Important Update\nThe league draft will be held next Friday at 8 PM EST.
@@ -237,77 +244,102 @@ class NBA2KCog(commands.Cog):
     @commands.command(name='myplayer', help='Get detailed information about your player')
     async def my_player(self, ctx):
         logging.info(f"my_player command invoked by user ID: {ctx.author.id}")
+        print(f"my_player command invoked by user ID: {ctx.author.id}")
         
         try:
             player_info = self.get_player_info(ctx.author.id)
+            print(f"Player info in my_player command: {player_info}")
             logging.info(f"Player info retrieved: {player_info}")
             
             if player_info:
-                logging.info("Creating player embed")
+                logging.info("About to call create_player_embed")
+                print("About to call create_player_embed")
                 embed = self.create_player_embed(player_info)
-                logging.info(f"Embed created: {embed.to_dict()}")
+                logging.info("Returned from create_player_embed")
+                print("Returned from create_player_embed")
                 
-                embed.set_footer(text="Player Info v2.2")  # Updated version
-                view = self.create_stats_button(ctx.author.id)
-                await ctx.send(embed=embed, view=view)
+                if embed:
+                    logging.info(f"Embed created: {embed.to_dict()}")
+                    print(f"Embed created: {embed.to_dict()}")
+                    
+                    embed.set_footer(text="Player Info v2.2")
+                    view = self.create_stats_button(ctx.author.id)
+                    await ctx.send(embed=embed, view=view)
+                else:
+                    logging.error("create_player_embed returned None")
+                    print("create_player_embed returned None")
+                    await ctx.send("An error occurred while creating your player profile. Please try again later.")
             else:
                 logging.warning(f"No player information found for user ID: {ctx.author.id}")
+                print(f"No player information found for user ID: {ctx.author.id}")
                 await ctx.send("No player information found. Please contact an admin if you believe this is an error.")
         
         except Exception as e:
             logging.error(f"Error in my_player command: {str(e)}")
+            print(f"Error in my_player command: {str(e)}")
             await ctx.send("An error occurred while retrieving your player information. Please try again later.")
 
     def create_player_embed(self, player):
-        logging.info(f"Creating embed for player: {player.get('Player Name', player.get('name', 'Unknown'))}")
-        embed = discord.Embed(
-            title=f"{player.get('Player Name', player.get('name', 'Unknown'))} - {player.get('position', 'N/A')}",
-            color=discord.Color.blue()
-        )
-        
-        # GOAT Points and Tier (from Firebase)
-        goat_points = player.get('Total GOAT Points', 0)
-        tier = player.get('Tier', 'N/A')
-        logging.info(f"GOAT Points: {goat_points}, Tier: {tier}")
-        embed.add_field(name="🏆 GOAT Points", value=f"{goat_points:,}", inline=True)
-        embed.add_field(name="🏅 Tier", value=tier, inline=True)
-        embed.add_field(name="\u200b", value="\u200b", inline=True)  # Empty field for alignment
-        
-        # Player attributes
-        embed.add_field(name="👤 Overall", value=player.get('overall', 'N/A'), inline=True)
-        embed.add_field(name="🎂 Age", value=player.get('age', 'N/A'), inline=True)
-        embed.add_field(name="🏀 Years in NBA", value=player.get('yearsInNBA', 'N/A'), inline=True)
-        
-        embed.add_field(name="📈 Potential", value=player.get('potential', 'N/A'), inline=True)
-        if 'contract' in player:
-            embed.add_field(name="📄 Contract Years Left", value=player['contract'].get('yearsLeft', 'N/A'), inline=True)
-        embed.add_field(name="\u200b", value="\u200b", inline=True)  # Empty field for alignment
+        print("Entered create_player_embed function")
+        logging.info("Entered create_player_embed function")
+        print(f"Player data received: {player}")
+        logging.info(f"Player data received: {player}")
 
-        if 'skills' in player:
-            embed.add_field(name="💪 Skills", value=', '.join(player['skills']), inline=False)
+        try:
+            embed = discord.Embed(
+                title=f"{player.get('Player Name', player.get('name', 'Unknown'))} - {player.get('position', 'N/A')}",
+                color=discord.Color.blue()
+            )
+            
+            # GOAT Points and Tier (from Firebase)
+            goat_points = player.get('Total GOAT Points', 0)
+            tier = player.get('Tier', 'N/A')
+            print(f"GOAT Points: {goat_points}, Tier: {tier}")
+            logging.info(f"GOAT Points: {goat_points}, Tier: {tier}")
+            embed.add_field(name="🏆 GOAT Points", value=f"{goat_points:,}", inline=True)
+            embed.add_field(name="🏅 Tier", value=tier, inline=True)
+            embed.add_field(name="\u200b", value="\u200b", inline=True)  # Empty field for alignment
+            
+            # Player attributes (from local data)
+            embed.add_field(name="👤 Overall", value=player.get('overall', 'N/A'), inline=True)
+            embed.add_field(name="🎂 Age", value=player.get('age', 'N/A'), inline=True)
+            embed.add_field(name="🏀 Years in NBA", value=player.get('yearsInNBA', 'N/A'), inline=True)
+            
+            embed.add_field(name="📈 Potential", value=player.get('potential', 'N/A'), inline=True)
+            if 'contract' in player:
+                embed.add_field(name="📄 Contract Years Left", value=player['contract'].get('yearsLeft', 'N/A'), inline=True)
+            embed.add_field(name="\u200b", value="\u200b", inline=True)  # Empty field for alignment
 
-        # Completed achievements (from Firebase)
-        completed_achievements = [
-            achievement for achievement, value in player.get('Achievements', {}).items()
-            if value is True or (isinstance(value, (int, float)) and value > 0)
-        ]
-        if completed_achievements:
-            achievements_text = ", ".join(completed_achievements[:5])
-            if len(completed_achievements) > 5:
-                achievements_text += f", and {len(completed_achievements) - 5} more"
-            embed.add_field(name="🏆 Completed Achievements", value=achievements_text, inline=False)
+            if 'skills' in player:
+                embed.add_field(name="💪 Skills", value=', '.join(player['skills']), inline=False)
 
-        # Narratives and rivals (from local JSON)
-        if player.get('narratives'):
-            embed.add_field(name="📖 Narratives", value='\n'.join(player['narratives']), inline=False)
-        if player.get('rivals'):
-            embed.add_field(name="⚔️ Rivals", value=', '.join(player['rivals']), inline=False)
+            # Completed achievements (from Firebase)
+            achievements = player.get('Achievements', {})
+            print(f"Achievements: {achievements}")
+            logging.info(f"Achievements: {achievements}")
+            if achievements:
+                achievements_text = ", ".join(list(achievements.keys())[:5])
+                if len(achievements) > 5:
+                    achievements_text += f", and {len(achievements) - 5} more"
+                embed.add_field(name="🏆 Completed Achievements", value=achievements_text, inline=False)
 
-        logging.info(f"Final embed: {embed.to_dict()}")
-        return embed
+            # Narratives and rivals (from local data)
+            if player.get('narratives'):
+                embed.add_field(name="📖 Narratives", value='\n'.join(player['narratives']), inline=False)
+            if player.get('rivals'):
+                embed.add_field(name="⚔️ Rivals", value=', '.join(player['rivals']), inline=False)
+
+            print(f"Final embed: {embed.to_dict()}")
+            logging.info(f"Final embed: {embed.to_dict()}")
+            return embed
+        except Exception as e:
+            print(f"Error in create_player_embed: {str(e)}")
+            logging.error(f"Error in create_player_embed: {str(e)}")
+            return None
 
     def create_stats_button(self, user_id):
         logging.info(f"Creating stats button for user ID: {user_id}")
+        print(f"Creating stats button for user ID: {user_id}")  # Print statement
         view = View()
         button = Button(style=ButtonStyle.primary, label="View Detailed Stats", custom_id=f"stats_{user_id}")
         button.callback = self.stats_button_callback
@@ -316,6 +348,7 @@ class NBA2KCog(commands.Cog):
 
     async def stats_button_callback(self, interaction: discord.Interaction):
         logging.info(f"Stats button clicked by user ID: {interaction.user.id}")
+        print(f"Stats button clicked by user ID: {interaction.user.id}")  # Print statement
         custom_id = interaction.data['custom_id']
         user_id = int(custom_id.split('_')[1])
         if interaction.user.id != user_id:
@@ -325,6 +358,7 @@ class NBA2KCog(commands.Cog):
         await interaction.response.defer()
         
         player_info = self.get_player_info(user_id)
+        print(f"Player info in stats_button_callback: {player_info}")  # Print statement
         if not player_info:
             await interaction.followup.send("Stats not available for your player.")
             return
@@ -355,7 +389,7 @@ class NBA2KCog(commands.Cog):
         else:
             embed.description = "No detailed stats available for this player."
 
-        logging.info(f"Sending detailed stats embed: {embed.to_dict()}")
+        print(f"Sending detailed stats embed: {embed.to_dict()}")  # Print statement
         await interaction.followup.send(embed=embed)
     
     @commands.command(name='myteam', help='Get information about your team')
@@ -366,20 +400,6 @@ class NBA2KCog(commands.Cog):
             await ctx.send(embed=embed)
         else:
             await ctx.send("You don't have a team in this league. Please contact an admin if you believe this is an error.")
-
-    def create_player_embed(self, player):
-        embed = discord.Embed(title=f"{player['name']} - {player['position']}", color=discord.Color.blue())
-        embed.add_field(name="Overall", value=player['overall'], inline=True)
-        embed.add_field(name="Age", value=player['age'], inline=True)
-        embed.add_field(name="Years in NBA", value=player['yearsInNBA'], inline=True)
-        embed.add_field(name="Potential", value=player['potential'], inline=True)
-        embed.add_field(name="Skills", value=', '.join(player['skills']), inline=False)
-        embed.add_field(name="Contract Years Left", value=player['contract']['yearsLeft'], inline=True)
-        if player['narratives']:
-            embed.add_field(name="Narratives", value='\n'.join(player['narratives']), inline=False)
-        if player['rivals']:
-            embed.add_field(name="Rivals", value=', '.join(player['rivals']), inline=False)
-        return embed
 
     def create_team_embed(self, team_data):
         embed = discord.Embed(title=f"{team_data['team']['name']} - {team_data['season']} Season", color=discord.Color.gold())
