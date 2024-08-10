@@ -11,12 +11,12 @@ class TarotCard:
         self.meaning_upright = meaning_upright
         self.meaning_reversed = meaning_reversed
         self.image_url = image_url
-        self.card_of_the_day = None
-        self.last_reset_date = None
 
 class TarotCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.card_of_the_day = None
+        self.last_reset_date = None
         self.tarot_deck = [
         TarotCard("The Fool", "New beginnings, innocence, spontaneity", 
                 "Embracing spontaneity, new perspectives, leap of faith", 
