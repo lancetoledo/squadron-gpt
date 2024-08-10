@@ -3,6 +3,7 @@ from discord.ext import commands
 import random
 import openai
 import asyncio
+import datetime
 
 class TarotCard:
     def __init__(self, name, meaning_upright, meaning_reversed, image_url):
@@ -10,6 +11,8 @@ class TarotCard:
         self.meaning_upright = meaning_upright
         self.meaning_reversed = meaning_reversed
         self.image_url = image_url
+        self.card_of_the_day = None
+        self.last_reset_date = None
 
 class TarotCog(commands.Cog):
     def __init__(self, bot):
@@ -282,6 +285,35 @@ class TarotCog(commands.Cog):
         embed.add_field(name="Card", value=card.name, inline=False)
         embed.add_field(name="Position", value="Upright" if is_upright else "Reversed", inline=False)
         embed.add_field(name="Meaning", value=card.meaning_upright if is_upright else card.meaning_reversed, inline=False)
+        
+        await ctx.send(embed=embed)
+
+    @commands.command()
+    async def card_of_the_day(self, ctx):
+        """Draw the card of the day for inspiration or guidance."""
+        current_date = datetime.date.today()
+        
+        # Check if we need to draw a new card for the day
+        if self.card_of_the_day is None or self.last_reset_date != current_date:
+            # Use the current date as a seed for random selection
+            # This ensures the same card is drawn for all users on a given day
+            seed = int(current_date.strftime("%Y%m%d"))
+            random.seed(seed)
+            
+            self.card_of_the_day = random.choice(self.tarot_deck)
+            self.last_reset_date = current_date
+            
+            # Reset the random seed
+            random.seed()
+
+        # Randomly decide if the card is upright or reversed
+        is_upright = random.choice([True, False])
+        
+        embed = discord.Embed(title=f"Card of the Day: {self.card_of_the_day.name}", color=0x7289DA)
+        embed.set_image(url=self.card_of_the_day.image_url)
+        embed.add_field(name="Date", value=current_date.strftime("%B %d, %Y"), inline=False)
+        embed.add_field(name="Position", value="Upright" if is_upright else "Reversed", inline=False)
+        embed.add_field(name="Meaning", value=self.card_of_the_day.meaning_upright if is_upright else self.card_of_the_day.meaning_reversed, inline=False)
         
         await ctx.send(embed=embed)
 
