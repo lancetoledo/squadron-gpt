@@ -172,6 +172,31 @@ class NBA2KCog(commands.Cog):
         
         print(f"No player data found for GM: {gm_name}")  # Print statement
         return None
+    
+    @commands.command(name='info', help='Request any information about the league')
+    async def request_info(self, ctx, *, request: str):
+        await self.relay_to_admin(ctx, f"league information: {request}")
+
+    async def relay_to_admin(self, ctx, request_type: str):
+        admin = await self.bot.fetch_user(self.admin_id)
+        await admin.send(f"{ctx.author.name} is requesting {request_type}. Please respond with the information.")
+        await ctx.send(f"Your request for {request_type} has been sent to the admin. Please wait for a response.")
+
+        def check(m):
+            return m.author.id == self.admin_id and isinstance(m.channel, discord.DMChannel)
+
+        try:
+            admin_response = await self.bot.wait_for('message', check=check, timeout=7200.0)
+            
+            formatted_message = self.format_message(admin_response.content)
+            
+            channel = self.bot.get_channel(self.nba2k_channel_id)
+            await channel.send(f"**Information Request: {request_type}**\n\n{formatted_message}")
+            
+            if ctx.channel.id != self.nba2k_channel_id:
+                await ctx.send(f"Your requested information has been posted in the NBA2K channel.")
+        except asyncio.TimeoutError:
+            await ctx.send("The admin did not respond within 2 hours. Please try your request again later.")
 
     # !send # Important Update\nThe league draft will be held next Friday at 8 PM EST.
     @commands.command(name='send', help='Send an embedded message to the specified channel')
