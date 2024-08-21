@@ -9,6 +9,7 @@ from typing import Dict, List
 import asyncio
 import re
 from datetime import datetime, timedelta
+from typing import Optional
 import os
 import firebase_admin
 from firebase_admin import credentials, firestore
@@ -41,6 +42,7 @@ class NBA2KCog(commands.Cog):
         self.db = None
         self.nba2k_data = None
         self.load_local_data()  # Load local data in __init__
+        self.current_sim_date: Optional[datetime] = None
         
     def load_local_data(self):
         try:
@@ -484,6 +486,76 @@ class NBA2KCog(commands.Cog):
     @commands.command(name='myattributes', help='Get your player attributes')
     async def my_attributes(self, ctx):
         await self.relay_to_admin(ctx, "player attributes")
+
+    @commands.command(name='leagueupdate', help='Post a league update with simulation date (Admin only)')
+    @commands.has_permissions(administrator=True)
+    async def league_update(self, ctx, *, update_text: str):
+        # Split the update text into date and content
+        date_and_content = update_text.split(' ', 2)
+        if len(date_and_content) < 3:
+            await ctx.send("Invalid format. Please use: MM/DD/YYYY Title\nContent")
+            return
+        
+        sim_date_str, title, content = date_and_content
+
+        # Parse the simulation date
+        try:
+            sim_date = datetime.strptime(sim_date_str, "%m/%d/%Y").date()
+        except ValueError:
+            await ctx.send("Invalid date format. Please use MM/DD/YYYY.")
+            return
+
+        # Update the current simulation date
+        self.current_sim_date = sim_date
+        
+        # Create the embed
+        embed = discord.Embed(
+            title=title,
+            description=self.format_message(content),
+            color=discord.Color.blue()
+        )
+        embed.add_field(name="Simulation Date", value=sim_date.strftime("%B %d, %Y"), inline=False)
+        embed.set_footer(text="MyNBA League Simulation Update")
+        
+        # Send the embed to the NBA2K channel
+        channel = self.bot.get_channel(self.nba2k_channel_id)
+        await channel.send(embed=embed)
+        
+        # Confirm to the admin that the update was sent
+        await ctx.send("League update posted successfully!")
+
+    @commands.command(name='simdate', help='Check the current simulation date')
+    async def sim_date(self, ctx):
+        if self.current_sim_date:
+            await ctx.send(f"The current simulation date is {self.current_sim_date.strftime('%B %d, %Y')}.")
+        else:
+            await ctx.send("The simulation date hasn't been set yet.")
+
+    @commands.command(name='latestupdates', help='Show the latest league updates')
+    async def latest_updates(self, ctx, count: int = 5):
+        channel = self.bot.get_channel(self.nba2k_channel_id)
+        updates = []
+        async for message in channel.history(limit=100):
+            if message.author == self.bot.user and message.embeds and message.embeds[0].footer.text == "MyNBA League Simulation Update":
+                updates.append(message.embeds[0])
+                if len(updates) == count:
+                    break
+        
+        if not updates:
+            await ctx.send("No recent league updates found.")
+            return
+        
+        for update in updates:
+            await ctx.send(embed=update)
+
+    @commands.command(name='setsimdate', help='Set the current simulation date without posting an update (Admin only)')
+    @commands.has_permissions(administrator=True)
+    async def set_sim_date(self, ctx, date_str: str):
+        try:
+            self.current_sim_date = datetime.strptime(date_str, "%m/%d/%Y").date()
+            await ctx.send(f"Simulation date set to {self.current_sim_date.strftime('%B %d, %Y')}.")
+        except ValueError:
+            await ctx.send("Invalid date format. Please use MM/DD/YYYY.")   
 
     @commands.command(name='leaderboard', help='View the G.O.A.T points leaderboard')
     async def leaderboard(self, ctx):
